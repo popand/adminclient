@@ -1,0 +1,32 @@
+<form novalidate="novalidate" name="genreForm">
+    <fieldset>
+        <div class="form-group">
+            <label class="control-label">Name:</label>
+            <input class="form-control" type="text" ng-model="vm.genre.name" name="name" placeholder="Name">
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Tenant Id:</label>
+            <input class="form-control" type="text" ng-model="vm.genre.tenantId" name="tenantId" placeholder="Tenant Id">
+        </div>
+
+        <!-- <section>
+            <label class="input">
+                Deleted On:
+                <input type="text" ng-model="vm.genre.deleteDate" name="deleteDate" readonly disabled="disabled">
+            </label>
+        </section> -->
+    </fieldset>
+
+    <div class="form-actions">
+        <button ng-if="vm.genre.id" ng-click="vm.remove()" class="btn btn-danger pull-left">
+            Delete
+        </button>
+        <a class="btn btn-default" data-ui-sref="app.genres">
+            Back
+        </a>
+        <button type="submit" class="btn btn-primary" ng-click="vm.submit()">
+            {{ vm.genre.id? 'Update' : 'Create' }}
+        </button>
+    </div>
+</form>

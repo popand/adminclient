@@ -21,20 +21,19 @@ angular.module('app', [
 
     // App
     'app.auth',
-    'app.layout',
-    'app.chat',
     'app.dashboard',
+    'app.layout',
     'app.calendar',
-    'app.inbox',
     'app.graphs',
-    'app.tables',
-    'app.forms',
-    'app.ui',
-    'app.widgets',
-    'app.maps',
-    'app.appViews',
-    'app.misc',
-    'app.smartAdmin'
+    'app.chat',
+
+    // Libertas
+    'libertas',
+    'app.products',
+    'app.promotions',
+    'app.offers',
+    'app.entitlements',
+    'app.genres'
 ])
 .config(function ($provide, $httpProvider) {
 
@@ -44,9 +43,16 @@ angular.module('app', [
         var errorCounter = 0;
         function notifyError(rejection){
             console.log(rejection);
+            var data = rejection.data;
+
+            // Ignore invalid access token errors
+            if (rejection.status === 401 && data.error === 'invalid_token') {
+                return;
+            }
+
             $.bigBox({
                 title: rejection.status + ' ' + rejection.statusText,
-                content: rejection.data,
+                content: rejection.data? (rejection.data.message || rejection.data) : 'Unknown error happened',
                 color: "#C46A69",
                 icon: "fa fa-warning shake animated",
                 number: ++errorCounter,

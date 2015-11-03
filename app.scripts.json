@@ -10,6 +10,7 @@
     "angular-ui-router",
     "angular-resource",
     "angular-bootstrap",
+    "angular-local-storage",
     "restangular",
     "fastclick",
     "moment",
@@ -41,6 +42,7 @@
 
     "angular-easyfb": "plugin/angular-easyfb/angular-easyfb.min.js",
     "angular-google-plus": "plugin/angular-google-plus/dist/angular-google-plus.min.js",
+    "angular-local-storage": "plugin/angular-local-storage/angular-local-storage.min.js",
 
     "pace":"plugin/pace/pace.min.js",
 
@@ -170,4 +172,3 @@
 
   }
 }
-

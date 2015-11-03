@@ -1,7 +1,8 @@
 "use strict";
 
 angular.module('app.auth', [
-    'ui.router'
+    'ui.router',
+    'libertas'
 //        ,
 //        'ezfb',
 //        'googleplus'
@@ -16,27 +17,15 @@ angular.module('app.auth', [
 //        ezfbProvider.setInitParams({
 //            appId: authKeys.facebookAppId
 //        });
-    $stateProvider.state('realLogin', {
-        url: '/real-login',
-
-        views: {
-            root: {
-                templateUrl: "app/auth/login/login.html",
-                controller: 'LoginCtrl'
-            }
-        },
-        data: {
-            title: 'Login',
-            rootId: 'extra-page'
-        }
-
-    })
+    $stateProvider
 
     .state('login', {
         url: '/login',
         views: {
             root: {
-                templateUrl: 'app/auth/views/login.html'
+                templateUrl: 'app/auth/views/login.html',
+                controller: 'LoginCtrl',
+                controllerAs: 'vm'
             }
         },
         data: {
@@ -44,11 +33,10 @@ angular.module('app.auth', [
             htmlId: 'extr-page'
         },
         resolve: {
-            srcipts: function(lazyScript){
+            scripts: function(lazyScript){
                 return lazyScript.register([
                     'jquery-validation'
-                ])
-
+                ]);
             }
         }
     })
@@ -57,12 +45,21 @@ angular.module('app.auth', [
         url: '/register',
         views: {
             root: {
-                templateUrl: 'app/auth/views/register.html'
+                templateUrl: 'app/auth/views/register.html',
+                controller: 'RegisterCtrl',
+                controllerAs: 'vm'
             }
         },
         data: {
             title: 'Register',
             htmlId: 'extr-page'
+        },
+        resolve: {
+            scripts: function(lazyScript){
+                return lazyScript.register([
+                    'jquery-validation'
+                ]);
+            }
         }
     })
 

@@ -1,0 +1,46 @@
+<!-- MAIN CONTENT -->
+<div id="content">
+    <!-- widget grid -->
+    <section widget-grid id="widget-grid">
+        <div class="row">
+            <article class="col-sm-6 col-sm-offset-3">
+
+                <div jarvis-widget id="wid-id-3" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" data-widget-sortable="false">
+                    <!-- widget options:
+                    usage: <div jarvis-widget id="wid-id-0" data-widget-editbutton="false">
+
+                    data-widget-colorbutton="false"
+                    data-widget-editbutton="false"
+                    data-widget-togglebutton="false"
+                    data-widget-deletebutton="false"
+                    data-widget-fullscreenbutton="false"
+                    data-widget-custombutton="false"
+                    data-widget-collapsed="true"
+                    data-widget-sortable="false"
+
+                    -->
+                    <header>
+                        <h2>{{ vm.genre.id? 'Edit' : 'Create' }}</h2>
+                    </header>
+                    <!-- widget div-->
+
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body">
+                            <genre-form genre="::vm.genre" on-remove="vm.remove(genre)" on-submit="vm.submit(genre)"></genre-form>
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+
+
+            </div>
+            </article>
+
+
+        </div>
+
+    </section>
+</div>

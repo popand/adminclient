@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('SmartAdmin.Layout').directive('stateBreadcrumbs', function ($rootScope, $state) {
+angular.module('SmartAdmin.Layout').directive('stateBreadcrumbs', function ($rootScope, $state, $compile) {
 
 
     return {
@@ -12,24 +12,28 @@ angular.module('SmartAdmin.Layout').directive('stateBreadcrumbs', function ($roo
             function setBreadcrumbs(breadcrumbs) {
                 var html = '<li>Home</li>';
                 angular.forEach(breadcrumbs, function (crumb) {
-                    html += '<li>' + crumb + '</li>'
+                    html += '<li>' + crumb + '</li>';
                 });
-                element.html(html)
+                element.html(html);
             }
 
-            function fetchBreadcrumbs(stateName, breadcrunbs) {
+            function fetchBreadcrumbs(stateName, breadcrumbs) {
 
                 var state = $state.get(stateName);
 
-                if (state && state.data && state.data.title && breadcrunbs.indexOf(state.data.title) == -1) {
-                    breadcrunbs.unshift(state.data.title)
+                if (state && state.data) {
+                    var title = state.data.htmlTitle || state.data.title;
+
+                    if (title && breadcrumbs.indexOf(title) === -1) {
+                        breadcrumbs.unshift(title);
+                    }
                 }
 
                 var parentName = stateName.replace(/.?\w+$/, '');
                 if (parentName) {
-                    return fetchBreadcrumbs(parentName, breadcrunbs);
+                    return fetchBreadcrumbs(parentName, breadcrumbs);
                 } else {
-                    return breadcrunbs;
+                    return breadcrumbs;
                 }
             }
 
@@ -45,9 +49,13 @@ angular.module('SmartAdmin.Layout').directive('stateBreadcrumbs', function ($roo
 
             processState($state.current);
 
+            scope.state = $state;
+            $compile(element)(scope);
+
             $rootScope.$on('$stateChangeStart', function (event, state) {
                 processState(state);
-            })
+                $compile(element)(scope);
+            });
         }
-    }
+    };
 });

@@ -10,8 +10,9 @@ angular.module('app.chat').factory('ChatApi', function ($q, $rootScope, User, $h
         statuses: ['Online', 'Busy', 'Away', 'Log Off'],
         status: 'Online',
         setUser: function (user) {
-            if (ChatSrv.users.indexOf(_user) != -1)
+            if (ChatSrv.users.indexOf(_user) !== -1) {
                 ChatSrv.users.splice(ChatSrv.users.indexOf(_user), 1);
+            }
             _user = user;
             ChatSrv.users.push(_user);
         },
@@ -33,19 +34,16 @@ angular.module('app.chat').factory('ChatApi', function ($q, $rootScope, User, $h
     });
 
     ChatSrv.initialized.then(function () {
-
-        User.initialized.then(function () {
-            ChatSrv.setUser({
-                username: User.username,
-                picture: User.picture,
-                status: ChatSrv.status
-            });
+        ChatSrv.setUser({
+            username: User.username,
+            picture: User.picture,
+            status: ChatSrv.status
         });
 
         $rootScope.$watch(function () {
-            return User.username
+            return User.username;
         }, function (name, oldName) {
-            if (name != oldName) {
+            if (name !== oldName) {
                 ChatSrv.setUser({
                     username: User.username,
                     picture: User.picture,
