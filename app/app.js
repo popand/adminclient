@@ -12,9 +12,12 @@
 angular.module('app', [
     //'ngSanitize',
     'ngAnimate',
+    'ngMessages',
     'restangular',
     'ui.router',
     'ui.bootstrap',
+    'formly',
+    'formlyBootstrap',
 
     // Smartadmin Angular Common Module
     'SmartAdmin',
@@ -26,9 +29,12 @@ angular.module('app', [
     'app.calendar',
     'app.graphs',
     'app.chat',
+    'app.misc',
 
-    // Libertas
+    // Libertas Common
     'libertas',
+
+    // Libertas App
     'app.products',
     'app.promotions',
     'app.offers',
@@ -86,13 +92,31 @@ angular.module('app', [
 })
 .constant('APP_CONFIG', window.appConfig)
 
-.run(function ($rootScope
-    , $state, $stateParams
-    ) {
+.run(function($rootScope, $state, $stateParams) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     // editableOptions.theme = 'bs3';
 
+    $rootScope.$on('$stateChangeError', onError);
+
+    function onError(event, toState, toParams, fromState, fromParams, error) {
+        event.preventDefault();
+
+        switch(error.status) {
+        case 500:
+            $state.go('app.misc.error500');
+            break;
+        case 404:
+            $state.go('app.misc.error404');
+            break;
+        default:
+            if ($state.is('app.dashboard')) {
+                $state.go('app.misc.error500');
+            } else {
+                $state.go('app.dashboard');
+            }
+        }
+    }
 });
 
 

@@ -16,7 +16,7 @@ angular.module('app.promotions').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/promotions/views/promotions.html",
+                    templateUrl: "app/promotions/promotions.html",
                     controller: 'PromotionsCtrl',
                     controllerAs: 'vm'
                 }
@@ -33,7 +33,7 @@ angular.module('app.promotions').config(function ($stateProvider) {
                 }
             }
         })
-        .state('app.promotions.detail', {
+        .state('app.promotions.details', {
             url: '{id}',
             data: {
                 title: 'Promotion',
@@ -41,23 +41,19 @@ angular.module('app.promotions').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/promotions/views/promotion.detail.html",
-                    controller: function PromotionDetailCtrl(promotion) {
-                        this.promotion = promotion;
-                    },
+                    templateUrl: "app/_common/views/simple-details.tpl.html",
+                    controller: 'PromotionDetailsCtrl',
                     controllerAs: 'vm'
                 }
             },
             resolve: {
                 scripts: function(lazyScript) {
-                    return lazyScript.register([
-                            'jquery-validation',
-                            'bootstrap-tagsinput'
-                        ]);
+                    return lazyScript.register(['bootstrap-tagsinput']);
                 },
 
-                promotion: function($stateParams, Promotion) {
+                promotion: function($state, $stateParams, Promotion) {
                     var id = $stateParams.id;
+
                     if (id === 'create') {
                         return new Promotion();
                     }

@@ -16,7 +16,7 @@ angular.module('app.genres').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/genres/views/genres.html",
+                    templateUrl: "app/genres/genres.html",
                     controller: 'GenresCtrl',
                     controllerAs: 'vm'
                 }
@@ -33,7 +33,7 @@ angular.module('app.genres').config(function ($stateProvider) {
                 }
             }
         })
-        .state('app.genres.detail', {
+        .state('app.genres.details', {
             url: '{id}',
             data: {
                 title: 'Genre',
@@ -41,18 +41,12 @@ angular.module('app.genres').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/genres/views/genre.detail.html",
-                    controller: function GenreDetailCtrl(genre) {
-                        this.genre = genre;
-                    },
-                    controllerAs: 'vm'
+                    templateUrl: "app/_common/views/simple-details.tpl.html",
+                    controllerAs: 'vm',
+                    controller: 'GenreDetailsCtrl'
                 }
             },
             resolve: {
-                scripts: function(lazyScript) {
-                    return lazyScript.register(['jquery-validation']);
-                },
-
                 genre: function($stateParams, Genre) {
                     var id = $stateParams.id;
                     return id === 'create'? new Genre() : Genre.find(id);

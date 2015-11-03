@@ -3,14 +3,18 @@
     "jquery",
     "jquery-ui",
     "lodash",
+    "api-check",
     "bootstrap",
     "angular",
     "angular-sanitize",
     "angular-animate",
+    "angular-messages",
     "angular-ui-router",
     "angular-resource",
     "angular-bootstrap",
     "angular-local-storage",
+    "angular-formly",
+    "angular-formly-templates-bootstrap",
     "restangular",
     "fastclick",
     "moment",
@@ -24,6 +28,7 @@
 
     "jquery": "plugin/jquery/dist/jquery.min.js",
     "jquery-ui": "plugin/jquery-ui/jquery-ui.min.js",
+    "api-check": "plugin/api-check/api-check.min.js",
 
     "bootstrap": "plugin/bootstrap/dist/js/bootstrap.min.js",
 
@@ -32,6 +37,7 @@
     "restangular": "plugin/restangular/dist/restangular.min.js",
     "angular-sanitize": "plugin/angular-sanitize/angular-sanitize.min.js",
     "angular-animate": "plugin/angular-animate/angular-animate.min.js",
+    "angular-messages": "plugin/angular-messages/angular-messages.min.js",
     "angular-ui-router": "plugin/angular-ui-router/release/angular-ui-router.min.js",
 
     "angular-google-maps": "plugin/angular-google-maps/dist/angular-google-maps.2.0.5.min.js",
@@ -43,6 +49,8 @@
     "angular-easyfb": "plugin/angular-easyfb/angular-easyfb.min.js",
     "angular-google-plus": "plugin/angular-google-plus/dist/angular-google-plus.min.js",
     "angular-local-storage": "plugin/angular-local-storage/angular-local-storage.min.js",
+    "angular-formly": "/home/alex/workspace/libertas/adminclient/plugin/angular-formly/formly.min.js",
+    "angular-formly-templates-bootstrap": "/home/alex/workspace/libertas/adminclient/plugin/angular-formly-templates-bootstrap/angular-formly-templates-bootstrap.min.js",
 
     "pace":"plugin/pace/pace.min.js",
 

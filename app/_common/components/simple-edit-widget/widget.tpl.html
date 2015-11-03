@@ -1,0 +1,27 @@
+<div id="content">
+  <section widget-grid id="widget-grid">
+    <div class="row">
+      <article class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+        <div jarvis-widget id="wid-id-3" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" data-widget-sortable="false">
+            <header><h2>{{ ::vm.model.id? 'Edit' : 'Create' }}</h2></header>
+            <div>
+              <div class="widget-body">
+
+                <form ng-submit="vm.onSave()" name="simpleForm" novalidate>
+                  <formly-form model="vm.model" fields="::vm.fields" options="::vm.options">
+                    <div class="form-actions">
+                      <button ng-if="::vm.model.id" type="button" ng-click="vm.onDelete()" class="btn btn-danger pull-left">Delete</button>
+                      <button type="submit" class="btn btn-primary submit-button" ng-disabled="vm.form.$invalid">Save</button>
+                      <button type="button" class="btn btn-default" ng-click="vm.onBack()">Back</button>
+                    </div>
+                  </formly-form>
+                </form>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

@@ -1,21 +1,21 @@
 'use strict';
 
-angular.module('app.promotions')
-    .controller('PromotionsCtrl', PromotionsCtrl);
+angular.module('app.genres')
+    .controller('GenresCtrl', GenresCtrl);
 
-PromotionsCtrl.$inject = [
+GenresCtrl.$inject = [
     '$state',
-    'Promotion'
+    'Genre'
 ];
 
-function PromotionsCtrl($state, Promotion) {
+function GenresCtrl($state, Genre) {
     var vm = this;
 
     vm.fetch = fetchData;
     vm.edit = edit;
 
     function fetchData(config) {
-        return Promotion.list(config)
+        return Genre.list(config)
             .then(function(data) {
                 return {
                     data: data.content,
@@ -24,7 +24,7 @@ function PromotionsCtrl($state, Promotion) {
             });
     }
 
-    function edit(promotion) {
-        $state.go('app.promotions.detail', {id: promotion.id});
+    function edit(genre) {
+        $state.go('app.genres.details', {id: genre.id});
     }
 }

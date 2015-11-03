@@ -267,34 +267,5 @@ angular.module('SmartAdmin.Forms').value('formsCommon', {
             errorPlacement : function(error, element) {
                 error.insertAfter(element.parent());
             }
-        },
-        validateBootstrapOptions: {
-            errorElement: 'small',
-            errorClass: 'help-block',
-            highlight: function(element, errorClass, validClass) {
-                $(element).removeClass(errorClass).addClass(validClass);
-
-
-                var $parent = $(element).parent();
-                if (!$parent.hasClass('form-group')) {
-                    $parent = $parent.parent();
-                }
-                $parent.addClass('has-error').removeClass('has-success');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).removeClass(errorClass).addClass(validClass);
-                var $parent = $(element).parent();
-                if (!$parent.hasClass('form-group')) {
-                    $parent = $parent.parent();
-                }
-                $parent.removeClass('has-error').addClass('has-success');
-            },
-            errorPlacement : function(error, element) {
-                if (element.parent().hasClass('input-group')) {
-                    error.insertAfter(element.parent());
-                } else {
-                    error.insertAfter(element);
-                }
-            }
         }
     });
