@@ -16,10 +16,9 @@ function VodCtrl($state, Product) {
     vm.edit = edit;
 
     function fetchData(config) {
-        // config.tags = ['carousel', 'latest', 'recommendation'];
-        config.productIds = ["11caed9e-52d5-4311-b17b-e6d3719d3156"];
+        config.productType = ['Movie'];
 
-        return Product.retrieveByIds(config)
+        return Product.retrieveAll(config)
             .then(function(data) {
                 return {
                     data: data.content,
@@ -29,6 +28,6 @@ function VodCtrl($state, Product) {
     }
 
     function edit(product) {
-        $state.go('app.products.detail', {id: product.id});
+        $state.go('app.products.details', {id: product.id});
     }
 }

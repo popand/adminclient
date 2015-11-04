@@ -1,0 +1,68 @@
+<!-- MAIN CONTENT -->
+<div id="content">
+    <!-- widget grid -->
+    <section widget-grid id="widget-grid">
+
+
+        <div class="row">
+            <article class="col-sm-12">
+
+                <div jarvis-widget id="standard-datatable-widget" data-widget-color="darken" data-widget-editbutton="false" data-widget-deletebutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Movies</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                        <table id="vodTable" class="table table-striped table-bordered table-hover" width="100%"
+                            datatable-server-side
+                            on-data-request="vm.fetch(params)"
+                            on-create="vm.edit({id: 'create'})"
+                            on-item-click="vm.edit(item)"
+                        >
+                        <thead>
+                        <tr>
+                            <th data-key="id" data-hide="always">ID</th>
+                            <th data-key="shortTitle" data-class="expand"> Title</th>
+                            <th data-key="shortDescription" data-hide="always"><i class="fa fa-fw fa-align-left text-muted hidden-md hidden-sm hidden-xs"></i> Description</th>
+                            <th data-key="country" data-hide="phone"><i class="fa fa-fw fa-globe txt-color-blue hidden-md hidden-sm hidden-xs"></i> Country</th>
+                            <th data-key="releaseYear" data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> Year</th>
+                            <th data-key="rating" data-hide="phone, tablet"> Rating</th>
+                            <th data-key="runningTime" data-hide="phone, tablet"><i class="fa fa-fw fa-clock-o txt-color-blue hidden-md hidden-sm hidden-xs"></i> Running Time</th>
+                            <th data-key="averageUserRating" data-hide="phone, tablet"><i class="fa fa-fw fa-star txt-color-blue hidden-md hidden-sm hidden-xs"></i> Avg. Rating</th>
+                            <th data-key="tags" data-hide="always"><i class="fa fa-fw fa-tag txt-color-blue hidden-md hidden-sm hidden-xs"></i> Tags</th>
+                            <th data-key="comingSoon" data-hide="always"> Coming Soon</th>
+                            <th data-key="tenantIds" data-hide="always"> Tenant Ids</th>
+                            <th data-key="genres" data-hide="always"> Genres</th>
+                            <th data-key="actors" data-hide="always"> Actors</th>
+                            <th data-key="producers" data-hide="always"> Producers</th>
+                            <th data-key="directors" data-hide="always"> Directors</th>
+                            <th data-key="writers" data-hide="always"> Writers</th>
+                            <th data-key="languages" data-hide="always"> Languages</th>
+                            <th data-key="productType" data-hide="always"> Product Type</th>
+                            <th data-key="canWatchNow" data-hide="always"> Can Watch Now</th>
+                            <th data-key="contentProvider" data-hide="always"> Content Provider</th>
+                            <th data-key="blackoutIndicator" data-hide="always"> Blackout Indicator</th>
+                            <th data-key="versionId" data-hide="always"> Version Id</th>
+                            <th data-key="closedCaption" data-hide="always"> Closed Caption</th>
+                            <th data-key="seoUrl" data-hide="always"> SEO Url</th>
+                            <th data-key="network" data-hide="always"> Network</th>
+                            <th data-key="criticId" data-hide="always"> Critic Id</th>
+                            <th data-key="boxOfficeGross" data-hide="always"> Box Office Gross</th>
+                            <th data-key="altCode" data-hide="always"> Alt Code</th>
+                            <th data-key="ratingReason" data-hide="always"> Rating Reason</th>
+                            <th data-key="deleted" data-hide="always"> Deleted</th>
+                            <th data-key="name" data-hide="always"> Name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        </table>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>

@@ -8,8 +8,10 @@ angular.module('libertas')
 ProductFactory.$inject = ['libertasApi'];
 
 function ProductFactory(api) {
-    Product.retrieveByTags = retrieveByTags;
-    Product.retrieveByIds = retrieveByIds;
+    Product.retrieveAll = retrieveAll;
+    Product.retrieveByTags = retrieveAllByTags;
+    Product.retrieveByIds = retrieveAllByIds;
+
     Product.find = find;
     Product.save = save;
     Product.remove = remove;
@@ -69,12 +71,16 @@ function ProductFactory(api) {
     }
 
 
-    function retrieveByIds(params) {
+    function retrieveAllByIds(params) {
         return list(url('/v1/products/retrieveAllProductDetailsByIds'), params);
     }
 
-    function retrieveByTags(params) {
+    function retrieveAllByTags(params) {
         return list(url('/v1/products/retrieveAllProductDetailsByTags'), params);
+    }
+
+    function retrieveAll(params) {
+        return list(url('/v1/products/retrieveAllProductDetail'), params);
     }
 
     function save(product) {
@@ -96,7 +102,7 @@ function ProductFactory(api) {
     function find(id) {
         return api.request({
                 method: 'GET',
-                url: url('/v1/admin/products/' + id),
+                url: url('/v1/products/' + id + '/productDetails'),
             })
             .then(returnResponseObject);
     }

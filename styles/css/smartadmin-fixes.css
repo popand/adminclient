@@ -5,3 +5,7 @@
 .formly.row {
     display: block;
 }
+
+table.dataTable thead>tr>th {
+    white-space: nowrap;
+}

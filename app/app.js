@@ -96,6 +96,9 @@ angular.module('app', [
     // editableOptions.theme = 'bs3';
 
     $rootScope.$on('$stateChangeError', onError);
+    $rootScope.$on('$stateChangeStart', onStart);
+    $rootScope.$on('$stateChangeSuccess', onSuccess);
+
 
     function onError(event, toState, toParams, fromState, fromParams, error) {
         event.preventDefault();
@@ -114,6 +117,20 @@ angular.module('app', [
                 $state.go('app.dashboard');
             }
         }
+    }
+
+    function onStart(event, to, params) {
+        if (to.redirectTo) {
+            event.preventDefault();
+            $state.go(to.redirectTo, params);
+        }
+    }
+
+    function onSuccess(event, to, toParams, from, fromParams) {
+        $rootScope.previousState = {
+            name: from.name,
+            params: fromParams
+        };
     }
 });
 
