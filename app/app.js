@@ -16,8 +16,6 @@ angular.module('app', [
     'restangular',
     'ui.router',
     'ui.bootstrap',
-    'formly',
-    'formlyBootstrap',
 
     // Smartadmin Angular Common Module
     'SmartAdmin',

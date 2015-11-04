@@ -16,7 +16,7 @@ angular.module('app.offers').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/offers/views/offers.html",
+                    templateUrl: "app/offers/offers.html",
                     controller: 'OffersCtrl',
                     controllerAs: 'vm'
                 }
@@ -33,7 +33,7 @@ angular.module('app.offers').config(function ($stateProvider) {
                 }
             }
         })
-        .state('app.offers.detail', {
+        .state('app.offers.details', {
             url: '{id}',
             data: {
                 title: 'Offer',
@@ -41,18 +41,12 @@ angular.module('app.offers').config(function ($stateProvider) {
             },
             views: {
                 "content@app": {
-                    templateUrl: "app/offers/views/offer.detail.html",
-                    controller: function OfferDetailCtrl(offer) {
-                        this.offer = offer;
-                    },
+                    templateUrl: "app/_common/views/simple-details.tpl.html",
+                    controller: 'OfferDetailsCtrl',
                     controllerAs: 'vm'
                 }
             },
             resolve: {
-                scripts: function(lazyScript) {
-                    return lazyScript.register(['jquery-validation']);
-                },
-
                 offer: function($stateParams, Offer) {
                     var id = $stateParams.id;
                     return id === 'create'? new Offer() : Offer.find(id);

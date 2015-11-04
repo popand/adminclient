@@ -7,8 +7,8 @@
             <div>
               <div class="widget-body">
 
-                <form ng-submit="vm.onSave()" name="simpleForm" novalidate>
-                  <formly-form model="vm.model" fields="::vm.fields" options="::vm.options">
+                <form ng-submit="vm.onSave()" name="vm.form" novalidate>
+                  <formly-form model="vm.model" fields="::vm.fields" form="vm.form" options="::vm.options">
                     <div class="form-actions">
                       <button ng-if="::vm.model.id" type="button" ng-click="vm.onDelete()" class="btn btn-danger pull-left">Delete</button>
                       <button type="submit" class="btn btn-primary submit-button" ng-disabled="vm.form.$invalid">Save</button>

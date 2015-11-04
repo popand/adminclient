@@ -1,3 +1,7 @@
 .bootstrap-tagsinput input {
     padding: 6px 4px;
 }
+
+.formly.row {
+    display: block;
+}

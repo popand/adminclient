@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    angular.module('SmartAdmin')
+    angular.module('SmartAdmin.Formly')
         .run(addDateType);
 
     addDateType.$inject = [

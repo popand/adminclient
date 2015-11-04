@@ -25,6 +25,6 @@ function OffersCtrl($state, Offer) {
     }
 
     function edit(offer) {
-        $state.go('app.offers.detail', {id: offer.id});
+        $state.go('app.offers.details', {id: offer.id});
     }
 }

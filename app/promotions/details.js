@@ -6,7 +6,7 @@ angular.module('app.promotions')
 
 
 PromotionDetailsCtrl.$inject = [
-    'formlyFields',
+    'customFormlyFields',
     'promotion',
     'Promotion'
 ];
@@ -21,7 +21,7 @@ function PromotionDetailsCtrl(fields, promotion, Promotion) {
     vm.fields = [
         fields.name,
         fields.tenantId,
-        fields.tags(promotion.tags)
+        fields.tags
     ];
 
 

@@ -7,11 +7,11 @@
                 expression: function($viewValue, $modelValue) {
                     return moment($viewValue, format, true).isValid();
                 },
-                message: '"The date must be in ' + format + ' format"'
+                message: '"Enter a valid date"'
             };
         }
     };
 
-    angular.module('SmartAdmin')
+    angular.module('SmartAdmin.Formly')
         .value('customFormlyValidators', validators);
 }());
