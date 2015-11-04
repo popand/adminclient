@@ -25,6 +25,7 @@ function apiService($http, $q, $log, storage) {
      * @return {ng.IPromise<any>} [description]
      */
     function request(config) {
+        console.log('request', config);
         return ensureAccessToken()
             .then(doRequest)
             .catch(invalidAccessToken);

@@ -9,6 +9,7 @@ User.$inject = [
 
 function User(store, auth) {
     var anonymous = {
+        customerId: null,
         username: null,
         picture: 'styles/img/avatars/sunny.png',
     };
@@ -35,6 +36,7 @@ function User(store, auth) {
     function save() {
         store.set('auth.user', {
             username: user.username,
+            customerId: user.customerId
         });
     }
 }

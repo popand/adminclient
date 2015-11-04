@@ -6,22 +6,29 @@
 
     EntitlementsCtrl.$inject = [
         '$state',
+        'User',
         'Entitlement'
     ];
 
-    function EntitlementsCtrl($state, Entitlement) {
+    function EntitlementsCtrl($state, User, Entitlement) {
         var vm = this;
 
         vm.fetch = fetchData;
         vm.edit = edit;
 
         function fetchData(config) {
-            return Entitlement.list(config)
+            return Entitlement.list(User.customerId, config)
                 .then(function(data) {
                     return {
                         data: data.content,
                         total: data.totalElements
                     };
+                }, function(rejection) {
+                    if (rejection !== 'invalid_customer_id') {
+                        return rejection;
+                    }
+
+                    $state.go('login');
                 });
         }
 

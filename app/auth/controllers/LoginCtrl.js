@@ -32,6 +32,8 @@ function LoginCtrl($scope, $state, store, auth, User) {
                 store.set('auth.email', vm.email);
 
                 User.username = user.userName;
+                User.customerId = user.customerId;
+
                 if (vm.staySignedIn) {
                     User.save();
                 }
