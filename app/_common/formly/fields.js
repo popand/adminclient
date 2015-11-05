@@ -19,26 +19,21 @@
                 placeholder: "Tenant Id"
             }
         },
-        tags: {
-            key: "tags",
-            type: "input",
-            templateOptions: {
-                label: "Tags",
-            },
-            className: "tagsinput",
-            ngModelElAttrs: {
-                'smart-tagsinput': '',
-                'data-role': 'tagsinput',
-                'ng-list': ''
-            },
-            ngModelAttrs: {
-                value: {
-                    attribute: 'value'
+        tags: function(tags) {
+            return {
+                key: 'tags',
+                type: 'input',
+                templateOptions: {
+                    label: 'Tags',
+                },
+                className: 'tagsinput',
+                ngModelElAttrs: {
+                    'smart-tagsinput': '',
+                    'data-role': 'tagsinput',
+                    'ng-list': '',
+                    'value': tags.join(',')
                 }
-            },
-            expressionProperties: {
-                'templateOptions.value': 'model.tags.join(",")'
-            }
+            };
         },
     };
 

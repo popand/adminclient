@@ -21,7 +21,7 @@ function PromotionDetailsCtrl(fields, promotion, Promotion) {
     vm.fields = [
         fields.name,
         fields.tenantId,
-        fields.tags
+        fields.tags(promotion.tags)
     ];
 
 

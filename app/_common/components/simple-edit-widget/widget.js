@@ -22,9 +22,11 @@
         };
     }
 
-    SimpleEditWidgetController.$inject = ['$state', '$rootScope'];
+    SimpleEditWidgetController.$inject = [
+        '$state',
+    ];
 
-    function SimpleEditWidgetController($state, $rootScope) {
+    function SimpleEditWidgetController($state) {
         var vm = this;
 
         vm.onSave = save;
@@ -48,9 +50,8 @@
         }
 
         function goBack() {
-            var previous = $rootScope.previousState;
-            if (previous) {
-                $state.go(previous.name, previous.params);
+            if (_.get($state, '$current.parent.abstract')) {
+                $state.go('app.dashboard');
             } else {
                 $state.go('^');
             }

@@ -97,7 +97,6 @@ angular.module('app', [
 
     $rootScope.$on('$stateChangeError', onError);
     $rootScope.$on('$stateChangeStart', onStart);
-    $rootScope.$on('$stateChangeSuccess', onSuccess);
 
 
     function onError(event, toState, toParams, fromState, fromParams, error) {
@@ -124,13 +123,6 @@ angular.module('app', [
             event.preventDefault();
             $state.go(to.redirectTo, params);
         }
-    }
-
-    function onSuccess(event, to, toParams, from, fromParams) {
-        $rootScope.previousState = {
-            name: from.name,
-            params: fromParams
-        };
     }
 });
 
