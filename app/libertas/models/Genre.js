@@ -26,7 +26,7 @@ function GenreFactory(api) {
     function list(params) {
         var config = {
             method: 'GET',
-            url: url('/v1/admin/genre/findAll'),
+            url: url('/v1/genre/findAll'),
             params: params
         };
 
@@ -55,7 +55,7 @@ function GenreFactory(api) {
     // private
 
     function url(path) {
-        return api.url('/genreservice' + path);
+        return api.url('/productservice' + path);
     }
 
     function request(method, path, data) {
