@@ -6,14 +6,13 @@ angular.module('app.offers')
 
 
 OfferDetailsCtrl.$inject = [
-    'customFormlyField',
+    'customFormlyFields',
     'offer',
     'Offer'
 ];
 
-function OfferDetailsCtrl(field, offer, Offer) {
+function OfferDetailsCtrl(fields, offer, Offer) {
     var vm = this;
-    var dateFormat = 'MM/DD/YYYY';
 
     vm.model = offer;
     vm.onSave = save;
@@ -28,8 +27,8 @@ function OfferDetailsCtrl(field, offer, Offer) {
     }
 
     vm.fields = [
-        field('name'),
-        field('tenantId'),
+        fields.name,
+        fields.tenantId,
         {
             key: "regex",
             type: "input",
@@ -48,13 +47,10 @@ function OfferDetailsCtrl(field, offer, Offer) {
                 placeholder: "Offer Type"
             }
         },
-        {
-            className: 'row',
-            fieldGroup: [
-                dateField('startDateTimestampMillis', 'Start Date'),
-                dateField('endDateTimestampMillis', 'End Date'),
-            ]
-        },
+        fields.group([
+            fields.date('startDateTimestampMillis', 'Start Date'),
+            fields.date('endDateTimestampMillis', 'End Date'),
+        ]),
         {
             key: "entitlementDurationMillis",
             type: "input",
@@ -74,26 +70,4 @@ function OfferDetailsCtrl(field, offer, Offer) {
             }
         }
     ];
-
-    function dateField(key, label, className) {
-        return {
-            type: 'date',
-            key: key,
-            className: className || 'col-lg-6',
-            templateOptions: {
-                label: label,
-                required: true
-            },
-            parsers: [dateToTimestamp],
-            formatters: [timestampToDate]
-        };
-    }
-
-    function timestampToDate(value) {
-        return value? moment(+value).format(dateFormat) : value;
-    }
-
-    function dateToTimestamp(value) {
-        return +moment(value, dateFormat);
-    }
 }

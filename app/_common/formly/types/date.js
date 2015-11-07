@@ -10,6 +10,8 @@
     ];
 
     function addDateType(formlyConfig, validators) {
+        var dateFormat = 'MM/DD/YYYY';
+
         formlyConfig.setType({
             name: 'date',
             extends: 'input',
@@ -25,9 +27,19 @@
                 },
                 validators: {
                     date: validators.moment('MM/DD/YYYY')
-                }
+                },
+                parsers: [dateToTimestamp],
+                formatters: [timestampToDate]
             }
         });
+
+        function timestampToDate(value) {
+            return value? moment(+value).format(dateFormat) : value;
+        }
+
+        function dateToTimestamp(value) {
+            return +moment(value, dateFormat);
+        }
     }
 
 }());

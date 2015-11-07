@@ -2,10 +2,34 @@
     padding: 6px 4px;
 }
 
+table.dataTable thead>tr>th {
+    white-space: nowrap;
+}
+
 .formly.row {
     display: block;
 }
 
-table.dataTable thead>tr>th {
-    white-space: nowrap;
+.formly textarea.form-control {
+    resize: vertical;
+}
+
+.formly .nav-tabs>li>a>.fa {
+    opacity: 1;
+}
+
+.formly .nav-tabs>li>a:hover  {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.formly .nav-tabs>li.active>a:hover  {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent!important;
+}
+
+.formly .checkbox {
+    line-height: 1.62;
+    font-size: 13px;
 }

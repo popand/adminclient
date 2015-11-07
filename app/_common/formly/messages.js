@@ -10,6 +10,9 @@
     ];
 
     function run(formlyConfig, formlyValidationMessages) {
+        // Show validation errors on form submit, without manually blurring them.
+        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
+
         formlyConfig.setWrapper({
             name: 'validation',
             types: ['input', 'date'],

@@ -51,12 +51,15 @@
                 },
                 views: {
                     "content@app": {
-                        templateUrl: 'app/_common/views/simple-details.tpl.html',
+                        templateUrl: 'app/products/details.tpl.html',
                         controller: 'ProductDetailsCtrl',
                         controllerAs: 'vm'
                     }
                 },
                 resolve: {
+                    scripts: function(lazyScript) {
+                        lazyScript.register(['bootstrap-tagsinput']);
+                    },
                     product: function($stateParams, Product) {
                         var id = $stateParams.id;
                         return id === 'create'? new Product() : Product.find(id);

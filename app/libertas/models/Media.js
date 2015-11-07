@@ -5,7 +5,7 @@ angular.module('libertas')
     .factory('Media', Media);
 
 
-function Media(api) {
+function Media() {
     return function() {
         this.id = null;  // (string, optional),
         this.componentId = null;  // (string, optional),

@@ -1,0 +1,41 @@
+<div id="content">
+  <section widget-grid id="widget-grid">
+    <div class="row">
+      <article class="col-xs-12">
+        <form class="" ng-submit="vm.onSave()" name="vm.form" novalidate>
+
+          <div jarvis-widget id="wid-id-product-form" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+            <header><h2>{{ ::vm.model.id? 'Edit' : 'Create' }}</h2></header>
+            <div>
+              <div class="widget-body">
+
+                  <formly-form model="vm.model" fields="::vm.fields" form="vm.form" options="::vm.options">
+                  </formly-form>
+
+                  <div class="form-actions">
+                    <button ng-if="::vm.model.id" type="button" ng-click="vm.onDelete()" class="btn btn-danger pull-left">Delete</button>
+                    <button type="submit" class="btn btn-primary submit-button">Save</button>
+                    <button type="button" class="btn btn-default" ng-click="vm.onBack()">Back</button>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div jarvis-widget id="wid-id-product-po-form" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+            <header><h2>Purchase Options</h2></header>
+            <div>
+              <div class="widget-body">
+
+                  <formly-form model="vm.model" fields="::vm.purchaseOptions.fields" form="vm.form" options="::vm.purchaseOptions.options">
+                  </formly-form>
+
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </article>
+    </div>
+  </section>
+</div>

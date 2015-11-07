@@ -19,27 +19,67 @@
                 placeholder: "Tenant Id"
             }
         },
-        tags: function(tags) {
+
+        tags: function(model, key) {
+            key = key || 'tags';
+
             return {
-                key: 'tags',
+                key: key,
                 type: 'input',
                 templateOptions: {
-                    label: 'Tags',
+                    label: labelFromKey(key),
                 },
                 className: 'tagsinput',
                 ngModelElAttrs: {
                     'smart-tagsinput': '',
                     'data-role': 'tagsinput',
                     'ng-list': '',
-                    'value': tags.join(',')
+                    'value': (model[key] || []).join(',')
                 }
             };
         },
+
+        date: function(key, label, required, className) {
+            return {
+                type: 'date',
+                key: key,
+                className: className,
+                templateOptions: {
+                    label: label,
+                    required: required || false
+                }
+            };
+        },
+
+        group: function(fields, className)  {
+            var columns = 12 % fields.length || _.any(fields, 'className');
+            if (!columns) {
+                var columnSize = _.max([3, 12 / fields.length]);
+                _.each(fields, function(field) {
+                    field.className = 'col-xs-12 col-sm-' + columnSize;
+                });
+            }
+
+            return {
+                wrapper: 'fieldset',
+                className: _.isUndefined(className)? 'row' : className,
+                fieldGroup: fields
+            };
+        },
+
+        labelFromKey: labelFromKey
     };
 
     var field = function(name, field) {
         return _.defaultsDeep(field || {}, _.result(fields, name));
     };
+
+
+    function labelFromKey(key) {
+        var words = key.split(/(?=[A-Z])/);
+        words[0] = _.capitalize(words[0]);
+        return words.join(' ');
+    }
 
     angular.module('SmartAdmin.Formly')
         .value('customFormlyField', field)
