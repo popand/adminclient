@@ -12,7 +12,7 @@
         formlyConfigProvider.setWrapper({
             name: 'fieldset',
             template: [
-                '<fieldset">',
+                '<fieldset>',
                     '<formly-transclude></formly-transclude>',
                 '</fieldset>'
             ].join(' ')
