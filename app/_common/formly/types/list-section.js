@@ -2,6 +2,7 @@
     'use strict';
 
     angular.module('SmartAdmin.Formly')
+        .directive('tabActive', tabActiveDirective)
         .config(addListSectionType);
 
     addListSectionType.$inject = [
@@ -19,7 +20,7 @@
                     collapsed: true
                 }
             },
-            controller: function($scope) {
+            controller: function($scope, $timeout) {
                 var vm = this;
                 var model = $scope.model[$scope.options.key] || [];
 
@@ -35,27 +36,48 @@
                 vm.setItem = setItem;
                 vm.copyFields = copyFields;
 
+                // Adding new items takes too much time (> 1000ms).
+                // For now show a loading indicator.
+                vm.$processing = false;
+
+                function add() {
+                    if (vm.$processing) {
+                        return;
+                    }
+
+                    vm.$processing = true;
+
+                    $timeout(function() {
+                        model.push({});
+
+                        vm.$collapsed = false;
+                        vm.$active = model.length - 1;
+                        vm.$processing = false;
+                    });
+                }
+
+                function remove() {
+                    if (vm.$processing) {
+                        return;
+                    }
+
+                    model.splice(vm.$active, 1);
+                    vm.$active = model.length - 1;
+                }
+
+                function setItem(index, event) {
+                    if (vm.$processing) {
+                        return;
+                    }
+
+                    vm.$active = index;
+                    vm.$collapsed = false;
+                }
 
                 function copyFields(fields) {
                     fields = angular.copy(fields);
                     addUniqueIds(fields);
                     return fields;
-                }
-
-                function add() {
-                    model.push({});
-                    vm.$active = model.length - 1;
-                    vm.$collapsed = false;
-                }
-
-                function remove() {
-                    model.splice(vm.$active, 1);
-                    vm.$active = model.length - 1;
-                }
-
-                function setItem(index) {
-                    vm.$active = index;
-                    vm.$collapsed = false;
                 }
 
                 function addUniqueIds(fields) {
@@ -75,4 +97,21 @@
             }
         });
     }
+
+    function tabActiveDirective() {
+        return {
+            restrict: 'A',
+            scope: {
+                tabActive: '=',
+            },
+            link: function (scope, element) {
+                var $element = $(element);
+
+                scope.$watch('tabActive', function(active) {
+                    $element.toggleClass('active', active);
+                });
+            }
+        };
+    }
+
 }());

@@ -8,10 +8,9 @@
       </a>
     </li>
 
-    <li ng-class="{active: vm.$active === $index}" ng-repeat="item in model[options.key] track by $index">
-      <a ng-click="vm.setItem($index)">{{ $index + 1 }}</a>
+    <li tab-active="vm.$active === $index" ng-repeat="item in model[options.key] track by $index">
+      <a ng-click="vm.setItem($index, $event)">{{ $index + 1 }}</a>
     </li>
-
 
     <li ng-hide="vm.$active < 0 || vm.$collapsed" class="pull-right">
       <a class="txt-color-red" ng-click="vm.removeActive()" tooltip="Delete">
@@ -21,7 +20,7 @@
 
     <li>
       <a ng-click="vm.addNew()" tooltip="Add new">
-        <i class="fa fa-fw fa-plus txt-color-blue"></i>
+        <i class="fa fa-fw" ng-class="vm.$processing? 'fa-spinner fa-spin' : 'fa-plus txt-color-blue'"></i>
       </a>
     </li>
   </ul>
