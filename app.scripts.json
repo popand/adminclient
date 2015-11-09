@@ -49,8 +49,8 @@
     "angular-easyfb": "plugin/angular-easyfb/angular-easyfb.min.js",
     "angular-google-plus": "plugin/angular-google-plus/dist/angular-google-plus.min.js",
     "angular-local-storage": "plugin/angular-local-storage/angular-local-storage.min.js",
-    "angular-formly": "/home/alex/workspace/libertas/adminclient/plugin/angular-formly/formly.min.js",
-    "angular-formly-templates-bootstrap": "/home/alex/workspace/libertas/adminclient/plugin/angular-formly-templates-bootstrap/angular-formly-templates-bootstrap.min.js",
+    "angular-formly": "plugin/angular-formly/formly.min.js",
+    "angular-formly-templates-bootstrap": "plugin/angular-formly-templates-bootstrap/angular-formly-templates-bootstrap.min.js",
 
     "pace":"plugin/pace/pace.min.js",
 
