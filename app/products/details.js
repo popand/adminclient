@@ -24,8 +24,15 @@
         var vm = this;
         var group = fields.group;
 
+        console.log(angular.toJson(product, true));
+
         // TODO: genre entries are JSON strings for some reason
-        product.genres = _.map(product.genres, JSON.parse);
+        // product.genres = _.map(product.genres, JSON.parse);
+
+        // Should be booleans
+        _.each(['blackoutIndicator', 'closedCaption', 'comingSoon'], function(key) {
+            product[key] = JSON.parse(angular.lowercase(product[key]));
+        });
 
         vm.onSave = save;
         vm.onDelete = remove;
@@ -34,44 +41,16 @@
 
         vm.fields = getFields();
 
-        vm.purchaseOptions = {
-            fields: [
-                section('', 'purchaseOptionList', [
-                    text({key: 'id'}),
-                    text({key: 'offerId'}),
-                    text({key: 'tenantId'}),
-                    text({key: 'offerType'}),
-                    text({key: 'description'}),
-                    text({key: 'price'}),
-                    group([
-                        fields.date('startDateTimestampMillis', 'Start Date'),
-                        fields.date('endDateTimestampMillis', 'End Date'),
-                    ]),
-                    text({key: 'entitlementDurationMillis'}),
-                    text({key: 'creationDate'}),
-                    section('Media List', 'mediaList', [
-                        group([
-                            text({key: 'id'}),
-                            text({key: 'componentId'})
-                        ]),
-                        group([
-                            text({key: 'screenFormat'}),
-                            text({key: 'aspectRatio'}),
-                            text({key: 'mediaFormat'}),
-                            text({key: 'targetDevice'}),
-                        ])
-                    ]),
-                ], /* collapsed = */ false)
-            ],
-        };
-
         // Actions
 
         function save() {
-            if (vm.form.$valid) {
-                console.log(angular.toJson(vm.model, true));
-                // return Product.save(vm.model).then(goBack);
+            if (!vm.form.$valid) {
+                return;
             }
+            return Product.save(vm.model)
+                .then(function(product) {
+                    vm.model = product;
+                }); //.then(goBack);
         }
 
         function remove() {
@@ -98,12 +77,12 @@
 
         function getFields() {
             return [
-                text({key: 'id', required: true}),
+                text({key: 'id', required: false}),
                 text({key: 'bindId', required: true}),
 
                 group([
                     text({key: 'title', required: true}),
-                    text({key: 'shortTitle', required: true}),
+                    text({key: 'shortTitle', required: false}),
                 ]),
 
                 textarea({key: 'shortDescription'}),
@@ -119,6 +98,7 @@
                 text({key: 'productType', required: true}),
 
                 fields.tags(product, 'tags'),
+                fields.tags(product, 'genres'),
                 fields.tags(product, 'languages'),
 
                 group([
@@ -155,9 +135,7 @@
                     text({
                         key: 'releaseYear',
                         placeholder: moment().format('YYYY'),
-                        validators: {
-                            year: validators.moment('YYYY', '"Please enter a valid year"'),
-                        }
+                        validators: { year: validators.year }
                     }),
                 ]),
 
@@ -166,13 +144,8 @@
 
                     text({
                         key: 'runningTime',
-                        placeholder: moment().format('01:30:00'),
-                        validators: {
-                            time: validators.moment(
-                                'hh:mm:ss',
-                                '"Running time must be in format HH:MM:SS"'
-                            ),
-                        }
+                        placeholder: '01:30:00',
+                        validators: { time: validators.time }
                     }),
                 ]),
 
@@ -192,14 +165,15 @@
                 list({key: 'subtitleList'}),
                 list({key: 'producers'}),
 
-                section('Genres', 'genres', [
-                    group([
-                        text({key: '_id', label: 'Id'}),
-                        text({key: 'tenantId'}),
-                    ]),
-                    text({key: 'name'})
-                ]),
+                // section('Genres', 'genres', [
+                //     group([
+                //         text({key: '_id', label: 'Id'}),
+                //         text({key: 'tenantId'}),
+                //     ]),
+                //     text({key: 'name'})
+                // ]),
 
+                // TODO: imageType must be unique
                 section('Images', 'imageList', [
                     text({key: 'id'}),
                     text({
@@ -214,25 +188,39 @@
                     ])
                 ]),
 
-                section('Videos', 'videos', [
+                section('Previews', 'previewList', video()),
+                section('Videos', 'videos', video()),
+
+                section('Purchase Options', 'purchaseOptionList', [
+                    text({key: 'id'}),
+                    text({key: 'offerId'}),
+                    text({key: 'tenantId'}),
+                    text({key: 'offerType'}),
+                    text({key: 'description'}),
+                    text({key: 'price'}),
                     group([
-                        text({key: 'id'}),
-                        text({key: 'componentId'}),
+                        fields.date('startDateTimestampMillis', 'Start Date'),
+                        fields.date('endDateTimestampMillis', 'End Date'),
                     ]),
-                    text({
-                        key: 'url',
-                        label: 'URL',
-                        validators: _.pick(validators, 'url')
-                    }),
-                    group([
-                        text({key: 'screenFormat'}),
-                        text({key: 'aspectRatio'}),
-                        text({key: 'mediaFormat'}),
-                        text({key: 'targetDevice'}),
-                    ])
+                    text({key: 'entitlementDurationMillis'}),
+                    text({key: 'creationDate'}),
+                    section('Media List', 'mediaList', [
+                        group([
+                            text({key: 'id'}),
+                            text({key: 'componentId'}),
+                        ]),
+                        group([
+                            text({key: 'screenFormat'}),
+                            text({key: 'aspectRatio'}),
+                            text({key: 'mediaFormat'}),
+                            text({key: 'targetDevice'}),
+                        ])
+                    ]),
                 ])
             ];
         }
+
+        // Field helpers
 
         function section(label, key, fields, collapsed) {
             return {
@@ -245,7 +233,6 @@
                 }
             };
         }
-
 
         function integer(args) {
             return text(_.defaults(args, {validators: validators.integer}));
@@ -304,6 +291,26 @@
                     rows: args.rows || _.max([2, vm.model[args.key].length + 1])
                 }
             };
+        }
+
+        function video() {
+            return [
+                group([ // should be read-only
+                    text({key: 'id'}),
+                    text({key: 'componentId'}),
+                ]),
+                text({
+                    key: 'url',
+                    label: 'URL',
+                    validators: _.pick(validators, 'url')
+                }),
+                group([
+                    text({key: 'screenFormat'}),
+                    text({key: 'aspectRatio'}),
+                    text({key: 'mediaFormat'}),
+                    text({key: 'targetDevice'}),
+                ])
+            ];
         }
 
         function defaults(args) {

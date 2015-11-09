@@ -5,9 +5,9 @@ angular.module('libertas')
     .factory('Product', ProductFactory);
 
 
-ProductFactory.$inject = ['libertasApi'];
+ProductFactory.$inject = ['$q', 'libertasApi'];
 
-function ProductFactory(api) {
+function ProductFactory($q, api) {
     Product.retrieveAll = retrieveAll;
     Product.retrieveByTags = retrieveAllByTags;
     Product.retrieveByIds = retrieveAllByIds;
@@ -85,18 +85,61 @@ function ProductFactory(api) {
 
     function save(product) {
         if (product.id) {
-            return api.request({
+            return update(product);
+        } else {
+            return create(product);
+        }
+    }
+
+    function update(product) {
+        var components = getAddedComponents(product);
+        var genres = product.genres;
+        product.genres = [];
+
+        console.log(angular.toJson(product, true));
+
+        // Save the product.
+        var save = api.request({
                 method: 'PUT',
                 url: url('/v1/admin/products/' + product.id),
                 data: product
             });
-        } else {
-            return api.request({
+
+        return save
+            .then(returnResponseObject)
+            .then(addComponents(components))
+            .then(updateGenres)
+            .then(function(product) {
+                return product;
+            });
+
+        function updateGenres(data) {
+            var product = $q.when(data);
+
+            if (!_.isEmpty(genres)) {
+                product = product.then(addComponent('genre', genres)).then(setGenres);
+            }
+
+            return product;
+
+            function setGenres() {
+                data.genres = genres;
+                return data;
+            }
+        }
+
+    }
+
+    function create(product) {
+        var components = getAddedComponents(product);
+
+        var created = api.request({
                 method: 'POST',
                 url: url('/v1/admin/products'),
                 data: product
             });
-        }
+
+        return created.then(addComponents(components));
     }
 
     function find(id) {
@@ -112,6 +155,32 @@ function ProductFactory(api) {
             method: 'DELETE',
             url: url('/v1/admin/products/' + id),
         });
+    }
+
+    function addComponents(components) {
+        return function(product) {
+            product = $q.when(product);
+
+            _.each(components, function(list, key) {
+                _.each(list, function(value) {
+                    product = product
+                        .then(addComponent(key, value))
+                        .then(returnResponseObject);
+                });
+            });
+
+            return product;
+        };
+    }
+
+    function addComponent(key, data) {
+        return function(product) {
+            return api.request({
+                    method: 'POST',
+                    url: url('/v1/admin/products/' + product.id + '/' + key),
+                    data: data
+                });
+        };
     }
 
     // private
@@ -132,7 +201,26 @@ function ProductFactory(api) {
     }
 
     function returnResponseObject(response) {
+        console.log('returnResponseObject', response);
         return response.data.responseObject;
+    }
+
+    function getAddedComponents(product){
+        var ret = {
+            image: 'imageList',
+            video: 'videos',
+            preview: 'previewList',
+        };
+
+        _.each(ret, function(value, key) {
+            ret[key] = _.remove(product[value], withNoId);
+        });
+
+        return ret;
+
+        function withNoId(item) {
+            return !item.id;
+        }
     }
 }
 

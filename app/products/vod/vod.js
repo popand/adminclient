@@ -16,7 +16,7 @@ function VodCtrl($state, Product) {
     vm.edit = edit;
 
     function fetchData(config) {
-        config.productType = ['Movie'];
+        // config.productType = ['Movie'];
 
         return Product.retrieveAll(config)
             .then(function(data) {
