@@ -31,6 +31,9 @@
         },
     };
 
+    validators.time = validators.moment('HH:mm:ss', '"Running time must be in format HH:MM:SS"');
+    validators.year = validators.moment('YYYY', '"Please enter a valid year"');
+
     angular.module('SmartAdmin.Formly')
         .value('customFormlyValidators', validators);
 }());

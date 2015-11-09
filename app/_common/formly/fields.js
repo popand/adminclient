@@ -27,7 +27,7 @@
                 key: key,
                 type: 'input',
                 templateOptions: {
-                    label: labelFromKey(key),
+                    label: _.startCase(key),
                 },
                 className: 'tagsinput',
                 ngModelElAttrs: {
@@ -67,19 +67,12 @@
             };
         },
 
-        labelFromKey: labelFromKey
+        labelFromKey: _.startCase
     };
 
     var field = function(name, field) {
         return _.defaultsDeep(field || {}, _.result(fields, name));
     };
-
-
-    function labelFromKey(key) {
-        var words = key.split(/(?=[A-Z])/);
-        words[0] = _.capitalize(words[0]);
-        return words.join(' ');
-    }
 
     angular.module('SmartAdmin.Formly')
         .value('customFormlyField', field)
