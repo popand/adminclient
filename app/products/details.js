@@ -9,6 +9,7 @@
         '$state',
         'customFormlyFields',
         'customFormlyValidators',
+        'genres',
         'product',
         'Product',
         'Image',
@@ -18,8 +19,9 @@
     ];
 
     function ProductDetailsCtrl(
-        $state, fields, validators, product,
-        Product, Image, Video, PurchaseOption, Media
+        $state, fields, validators, genres,
+        product, Product,
+        Image, Video, PurchaseOption, Media
     ) {
         var vm = this;
         var group = fields.group;
@@ -74,7 +76,6 @@
         }
 
         // Fields
-
         function getFields() {
             return [
                 text({key: 'id', required: false}),
@@ -98,7 +99,17 @@
                 text({key: 'productType', required: true}),
 
                 fields.tags(product, 'tags'),
-                fields.tags(product, 'genres'),
+
+                {
+                    type: 'select2',
+                    key: 'genres',
+                    templateOptions: {
+                        label: 'Genres',
+                        valueProp: 'name',
+                        options: genres,
+                    }
+                },
+
                 fields.tags(product, 'languages'),
 
                 group([

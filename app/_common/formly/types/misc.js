@@ -26,5 +26,15 @@
               '</textarea>'
             ].join(' ')
         });
+
+        formlyConfigProvider.setType({
+            name: 'select2',
+            extends: 'select',
+            template: [
+              '<select data-smart-select2 multiple style="width:100%"',
+                'class="select2" ng-model="model[options.key]">',
+              '</select>'
+            ].join(' ')
+        });
     }
 }());

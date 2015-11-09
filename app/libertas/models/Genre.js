@@ -23,15 +23,20 @@ function GenreFactory(api) {
         this.name = null;  // (string, optional)
     }
 
-    function list(params) {
+    function list(params, all) {
         var config = {
             method: 'GET',
             url: url('/v1/genre/findAll'),
             params: params
         };
 
-        return api.request(config)
-            .then(returnResponseObject);
+        var r = api.request(config);
+
+        if (all) {
+            return api.all(r);
+        } else {
+            return r.then(returnResponseObject);
+        }
     }
 
     function save(genre) {

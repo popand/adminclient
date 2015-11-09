@@ -63,6 +63,9 @@
                     product: function($stateParams, Product) {
                         var id = $stateParams.id;
                         return id === 'create'? new Product() : Product.find(id);
+                    },
+                    genres: function(Genre) {
+                        return Genre.list({pageSize: 100, pageNumber: 0}, true);
                     }
                 }
             });
