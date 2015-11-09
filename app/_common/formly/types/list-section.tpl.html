@@ -1,14 +1,15 @@
 <div class="form-group">
   <ul class="nav nav-tabs bordered">
 
-    <li ng-if="::to.label" >
+    <li ng-if="::to.label">
       <a ng-click="vm.$collapsed = !vm.$collapsed">
         <i class="fa fa-fw fa-lg" ng-class="vm.$collapsed? 'fa-angle-up' : 'fa-angle-down'"></i>
         {{::to.label}}
       </a>
     </li>
 
-    <li tab-active="vm.$active === $index" ng-repeat="item in model[options.key] track by $index">
+
+    <li ng-hide="vm.$collapsed" tab-active="vm.$active === $index" ng-repeat="item in model[options.key] track by $index">
       <a ng-click="vm.setItem($index, $event)">{{ $index + 1 }}</a>
     </li>
 
@@ -18,7 +19,7 @@
       </a>
     </li>
 
-    <li>
+    <li ng-hide="vm.$collapsed">
       <a ng-click="vm.addNew()" tooltip="Add new">
         <i class="fa fa-fw" ng-class="vm.$processing? 'fa-spinner fa-spin' : 'fa-plus txt-color-blue'"></i>
       </a>
@@ -26,13 +27,12 @@
   </ul>
 
   <div class="tab-content padding-10" ng-hide="vm.$collapsed">
-    <div
+    <div class="tab-pane active"
       ng-repeat="item in model[options.key] track by $index"
-      ng-init="fields = vm.copyFields(to.fields)"
-      class="tab-pane active"
+      ng-init="::fields = vm.copyFields(to.fields)"
       ng-show="vm.$active === $index"
     >
-      <formly-form model="item" form="form" fields="fields">
+      <formly-form model="::item" form="::form" fields="::fields">
       </formly-form>
     </div>
 

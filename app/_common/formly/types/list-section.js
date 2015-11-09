@@ -10,7 +10,7 @@
     ];
 
     function addListSectionType(formlyConfigProvider) {
-        var unique = 1;
+        var sectionId = 1;
 
         formlyConfigProvider.setType({
             name: 'listSection',
@@ -28,7 +28,7 @@
                 $scope.model[$scope.options.key] = model;
                 $scope.formOptions = {formState: $scope.formState};
 
-                vm.$active = model.length > -1? 0 : -1;
+                vm.$active = 0;
                 vm.$collapsed = $scope.to.collapsed;
 
                 vm.addNew = add;
@@ -39,6 +39,9 @@
                 // Adding new items takes too much time (> 1000ms).
                 // For now show a loading indicator.
                 vm.$processing = false;
+
+                // Used to generate unique field ids
+                sectionId += 1;
 
                 function add() {
                     if (vm.$processing) {
@@ -61,8 +64,16 @@
                         return;
                     }
 
-                    model.splice(vm.$active, 1);
-                    vm.$active = model.length - 1;
+                    $.SmartMessageBox({
+                        title: "Confirmation",
+                        content: "Are you sure you want to delete this entry?",
+                        buttons: '[No][Delete]'
+                    }, function (pressed) {
+                        if (pressed === "Delete") {
+                            model.splice(vm.$active, 1);
+                            vm.$active = model.length - 1;
+                        }
+                    });
                 }
 
                 function setItem(index, event) {
@@ -91,7 +102,7 @@
                             addUniqueIds(field.templateOptions.fields);
                         }
 
-                        field.id = field.id || (field.key + '_' + index + '_' + unique++);
+                        field.id = field.id || [field.key, sectionId, index].join('_');
                     });
                 }
             }
