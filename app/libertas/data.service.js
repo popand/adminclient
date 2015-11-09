@@ -13,6 +13,7 @@ function apiService($http, $q, $log, storage) {
 
     api.request = request;
     api.url = url;
+    api.all = all;
 
     return api;
 
@@ -47,6 +48,43 @@ function apiService($http, $q, $log, storage) {
             return $q.reject(response);
         }
     }
+
+
+    function all(promise, iteratee) {
+        iteratee = iteratee || getResponseObject;
+
+        return next(promise, []);
+
+        function next(promise, content) {
+            return promise.then(function(response) {
+                var data = response.data;
+
+                if (data.success !== true) {
+                    $log.error('next', data.message, data.errors);
+                    return $q.reject(data.message);
+                }
+
+                var pagedData = iteratee(data);
+                if (!pagedData) {
+                    return data;
+                }
+
+                content = content.concat(pagedData.content || []);
+                if (pagedData.last === false) {
+                    var config = response.config;
+                    config.params.pageNumber += 1;
+                    return next(request(config), content);
+                }
+
+                return content;
+            });
+        }
+
+        function getResponseObject(data) {
+            return data.responseObject;
+        }
+    }
+
 
     function withAuthHeaders(config) {
         var headers = config.headers || {};
