@@ -9,9 +9,9 @@
         '$state',
         'customFormlyFields',
         'customFormlyValidators',
-        'genres',
         'product',
         'Product',
+        'Genre',
         'Image',
         'Video',
         'PurchaseOption',
@@ -19,9 +19,9 @@
     ];
 
     function ProductDetailsCtrl(
-        $state, fields, validators, genres,
+        $state, fields, validators,
         product, Product,
-        Image, Video, PurchaseOption, Media
+        Genre, Image, Video, PurchaseOption, Media
     ) {
         var vm = this;
         var group = fields.group;
@@ -106,8 +106,14 @@
                     templateOptions: {
                         label: 'Genres',
                         valueProp: 'name',
-                        options: genres,
-                    }
+                        options: _.map(product.genres, zipWith('name'))
+                    },
+                    controller: ['$scope', function($scope) {
+                        Genre.list({pageSize: 100, pageNumber: 0}, true)
+                            .then(function(genres) {
+                                $scope.to.options = genres;
+                            });
+                    }]
                 },
 
                 fields.tags(product, 'languages'),
@@ -175,14 +181,6 @@
                 list({key: 'writers'}),
                 list({key: 'subtitleList'}),
                 list({key: 'producers'}),
-
-                // section('Genres', 'genres', [
-                //     group([
-                //         text({key: '_id', label: 'Id'}),
-                //         text({key: 'tenantId'}),
-                //     ]),
-                //     text({key: 'name'})
-                // ]),
 
                 // TODO: imageType must be unique
                 section('Images', 'imageList', [
@@ -330,6 +328,14 @@
             args.placeholder = args.placeholder || args.label;
 
             return args;
+        }
+
+        function zipWith(key) {
+            return function(value) {
+                var ret = {};
+                ret[key] = value;
+                return ret;
+            };
         }
     }
 
