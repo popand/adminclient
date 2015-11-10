@@ -7,6 +7,7 @@
 
     ProductDetailsCtrl.$inject = [
         '$state',
+        '$timeout',
         'customFormlyFields',
         'customFormlyValidators',
         'product',
@@ -15,32 +16,52 @@
         'Image',
         'Video',
         'PurchaseOption',
-        'Media'
+        'Offer',
     ];
 
     function ProductDetailsCtrl(
-        $state, fields, validators,
+        $state, $timeout,
+        fields, validators,
         product, Product,
-        Genre, Image, Video, PurchaseOption, Media
+        Genre, Image, Video, PurchaseOption,
+        Offer
     ) {
         var vm = this;
         var group = fields.group;
-
-        console.log(angular.toJson(product, true));
-
-        // TODO: genre entries are JSON strings for some reason
-        // product.genres = _.map(product.genres, JSON.parse);
 
         // Should be booleans
         _.each(['blackoutIndicator', 'closedCaption', 'comingSoon'], function(key) {
             product[key] = JSON.parse(angular.lowercase(product[key]));
         });
 
+        product.offers = [];
+
+        _.each(product.purchaseOptionList, function(option, index) {
+            var ret = {};
+            ret.mediaList = _.pluck(option.mediaList, 'componentId');
+
+            if (!option.offerId) {
+                console.log(option);
+                if (product.id && option.id) {
+                    Product.removePurchaseOption(product, option.id);
+                }
+                delete product.purchaseOptionList[index];
+                return;
+            }
+
+            Offer.find(option.offerId).then(function(offer) {
+                ret.offer = offer;
+            });
+
+            product.offers.push(ret);
+        });
+
+        console.log(angular.toJson(product, true));
+
         vm.onSave = save;
         vm.onDelete = remove;
         vm.onBack = goBack;
         vm.model = product;
-
         vm.fields = getFields();
 
         // Actions
@@ -49,10 +70,14 @@
             if (!vm.form.$valid) {
                 return;
             }
+
             return Product.save(vm.model)
                 .then(function(product) {
+                    // TODO: on create form is cleared
                     vm.model = product;
-                }); //.then(goBack);
+
+                    console.log('saved', product);
+                });
         }
 
         function remove() {
@@ -98,24 +123,26 @@
 
                 text({key: 'productType', required: true}),
 
-                fields.tags(product, 'tags'),
-
                 {
                     type: 'select2',
                     key: 'genres',
                     templateOptions: {
                         label: 'Genres',
-                        valueProp: 'name',
-                        options: _.map(product.genres, zipWith('name'))
+                        options: product.genres,
+                        ngOptions: 'x for x in to.options track by x'
+                    },
+                    ngModelElAttrs: {
+                        'multiple': '',
                     },
                     controller: ['$scope', function($scope) {
                         Genre.list({pageSize: 100, pageNumber: 0}, true)
                             .then(function(genres) {
-                                $scope.to.options = genres;
+                                $scope.to.options = _.pluck(genres, 'name');
                             });
                     }]
                 },
 
+                fields.tags(product, 'tags'),
                 fields.tags(product, 'languages'),
 
                 group([
@@ -200,46 +227,86 @@
                 section('Previews', 'previewList', video()),
                 section('Videos', 'videos', video()),
 
-                section('Purchase Options', 'purchaseOptionList', [
-                    text({key: 'id'}),
-                    text({key: 'offerId'}),
-                    text({key: 'tenantId'}),
-                    text({key: 'offerType'}),
-                    text({key: 'description'}),
-                    text({key: 'price'}),
+                section('Offers', 'offers', [
+                    {
+                        type: 'select2',
+                        key: 'mediaList',
+                        templateOptions: {
+                            required: true,
+                            label: 'Media List',
+                            options: product.videos,
+                            ngOptions: 'x.id for x in to.options track by x.id'
+                        },
+                        ngModelElAttrs: {
+                            'multiple': '',
+                        },
+                        controller: ['$scope', function($scope) {
+                            $scope.$watch(function() {
+                                return vm.model.videos;
+                            }, function(videos) {
+                                $scope.to.options = _.filter(videos, 'id');
+                            });
+                        }]
+                    },
+
+                    {
+                        type: 'select2',
+                        key: 'offer',
+                        templateOptions: {
+                            label: 'Offer',
+                            options: [],
+                            ngOptions: 'x as x.name for x in to.options track by x.id'
+                        },
+                        controller: ['$scope', function($scope) {
+                            var empty = { id: null, name: 'New' };
+
+                            Offer.list({pageSize: 100, pageNumber: -1, cache: true})
+                                .then(function(offers) {
+                                    $scope.to.options = [empty].concat(offers);
+
+                                    _.each(offers, function(offer) {
+                                        var original = angular.toJson(offer);
+
+                                        offer.isDirty = function() {
+                                            return original !== angular.toJson(this);
+                                        };
+                                    });
+
+                                    // Workaround for select2, to set currently selected item.
+                                    $timeout(function() {
+                                        $scope.to.select($scope.originalModel.offerId);
+                                    });
+                                });
+                        }]
+                    },
+
+                    { template: '<hr/>'},
+                    text({key: 'offer.id', label: 'Id'}),
+                    text({key: 'offer.tenantId', label: 'Tenant Id'}),
+                    text({key: 'offer.regex', label: 'Regular Expression'}),
+                    text({key: 'offer.offerType', label: 'Offer Type'}),
+                    text({key: 'offer.name', label: 'Name'}),
+                    text({key: 'offer.price', label: 'Price'}),
                     group([
-                        fields.date('startDateTimestampMillis', 'Start Date'),
-                        fields.date('endDateTimestampMillis', 'End Date'),
+                        fields.date('offer.startDateTimestampMillis', 'Start Date'),
+                        fields.date('offer.endDateTimestampMillis', 'End Date'),
                     ]),
-                    text({key: 'entitlementDurationMillis'}),
-                    text({key: 'creationDate'}),
-                    section('Media List', 'mediaList', [
-                        group([
-                            text({key: 'id'}),
-                            text({key: 'componentId'}),
-                        ]),
-                        group([
-                            text({key: 'screenFormat'}),
-                            text({key: 'aspectRatio'}),
-                            text({key: 'mediaFormat'}),
-                            text({key: 'targetDevice'}),
-                        ])
-                    ]),
+                    text({key: 'offer.entitlementDurationMillis', label: 'Entitlement Duration'}),
                 ])
             ];
         }
 
         // Field helpers
 
-        function section(label, key, fields, collapsed) {
+        function section(label, key, fields, controller) {
             return {
                 key: key,
                 type: 'listSection',
                 templateOptions: {
                     label: label,
                     fields: fields,
-                    collapsed: _.isUndefined(collapsed)? true : collapsed
-                }
+                },
+                controller: controller
             };
         }
 

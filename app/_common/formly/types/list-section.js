@@ -22,10 +22,9 @@
             },
             controller: function($scope, $timeout) {
                 var vm = this;
-                var model = $scope.model[$scope.options.key] || [];
 
                 $scope.vm = vm;
-                $scope.model[$scope.options.key] = model;
+                $scope.model[$scope.options.key] = model() || [];
                 $scope.formOptions = {formState: $scope.formState};
 
                 vm.$active = 0;
@@ -43,6 +42,12 @@
                 // Used to generate unique field ids
                 sectionId += 1;
 
+                // Can't save the model in a local variable,
+                // because it can be replaced outside by someone else.
+                function model() {
+                    return $scope.model[$scope.options.key];
+                }
+
                 function add() {
                     if (vm.$processing) {
                         return;
@@ -51,10 +56,11 @@
                     vm.$processing = true;
 
                     $timeout(function() {
-                        model.push({});
+                        var items = model();
+                        items.push({});
 
                         vm.$collapsed = false;
-                        vm.$active = model.length - 1;
+                        vm.$active = items.length - 1;
                         vm.$processing = false;
                     });
                 }
@@ -70,8 +76,9 @@
                         buttons: '[No][Delete]'
                     }, function (pressed) {
                         if (pressed === "Delete") {
-                            model.splice(vm.$active, 1);
-                            vm.$active = model.length - 1;
+                            var items = model();
+                            items.splice(vm.$active, 1);
+                            vm.$active = items.length - 1;
                         }
                     });
                 }

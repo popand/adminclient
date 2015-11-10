@@ -30,15 +30,22 @@ function OfferFactory(api) {
         this.price = null; // (string, optional),
     }
 
-    function list(params) {
+    function list(args) {
+        var all = args.pageNumber < 0;
+
         var config = {
             method: 'GET',
-            url: url('/v1/admin/offer/findAll'),
-            params: params
+            url: url('/v1/offer/findAll'),
+            params: {
+                pageSize: args.pageSize,
+                pageNumber: all? 0 : args.pageNumber,
+            },
+            cache: args.cache
         };
 
-        return api.request(config)
-            .then(returnResponseObject);
+        var r = api.request(config);
+
+        return all? api.all(r) : r.then(returnResponseObject);
     }
 
     function save(offer) {

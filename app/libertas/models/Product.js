@@ -5,9 +5,9 @@ angular.module('libertas')
     .factory('Product', ProductFactory);
 
 
-ProductFactory.$inject = ['$q', 'libertasApi'];
+ProductFactory.$inject = ['$q', 'libertasApi', 'Offer'];
 
-function ProductFactory($q, api) {
+function ProductFactory($q, api, Offer) {
     Product.retrieveAll = retrieveAll;
     Product.retrieveByTags = retrieveAllByTags;
     Product.retrieveByIds = retrieveAllByIds;
@@ -15,6 +15,7 @@ function ProductFactory($q, api) {
     Product.find = find;
     Product.save = save;
     Product.remove = remove;
+    Product.removePurchaseOption = removePurchaseOption;
 
     return Product;
 
@@ -84,62 +85,69 @@ function ProductFactory($q, api) {
     }
 
     function save(product) {
+        product = _.cloneDeep(product);
+        console.log(angular.toJson(product, true));
+
+        var components = getAddedComponents(product);
+        var genres = _.remove(product.genres);
+
+        // Save all modified offers, later add them to the product.
+        var offers = saveOffers(product);
+        delete product.offers;
+
         if (product.id) {
-            return update(product);
+            product = update(product);
         } else {
-            return create(product);
+            product = create(product);
+        }
+
+        return product
+            .then(returnResponseObject)
+            .then(addComponents(components))
+            .then(updateGenres(genres))
+            .then(addPurchaseOptions);
+
+        function addPurchaseOptions(product) {
+            return $q.all(offers)
+                .then(function(offers) {
+                    return _.reduce(offers, function(promise, offer) {
+                        return promise.then(function(product) {
+                            // TODO: videos aren't saved by the server
+
+                            // var mediaList = [];
+                            // _.each(offer.mediaList, function(id) {
+                            //     var video = _.find(product.videos, {url: url});
+                            //     if (video) {
+                            //         mediaList.push(video);
+                            //     }
+                            // });
+
+                            offer.mediaList = [];
+                            return addPurchaseOption(product, offer);
+                        });
+                    }, $q.when(product))
+                    .then(function(product) {
+                        product.offers = offers;
+                        return product;
+                    });
+                });
         }
     }
 
     function update(product) {
-        var components = getAddedComponents(product);
-        var genres = product.genres;
-        product.genres = [];
-
-        console.log(angular.toJson(product, true));
-
-        // Save the product.
-        var save = api.request({
+        return api.request({
                 method: 'PUT',
                 url: url('/v1/admin/products/' + product.id),
                 data: product
             });
-
-        return save
-            .then(returnResponseObject)
-            .then(addComponents(components))
-            .then(updateGenres)
-            .then(function(product) {
-                return product;
-            });
-
-        function updateGenres(data) {
-            var product = $q.when(data);
-
-            if (!_.isEmpty(genres)) {
-                product = product.then(addComponent('genre', genres)).then(setGenres);
-            }
-
-            return product;
-
-            function setGenres() {
-                data.genres = genres;
-                return data;
-            }
-        }
-
     }
 
     function create(product) {
-        var components = getAddedComponents(product);
-
-        var created = api.request({
+        return api.request({
                 method: 'POST',
                 url: url('/v1/admin/products'),
                 data: product
             });
-
-        return created.then(addComponents(components));
     }
 
     function find(id) {
@@ -157,30 +165,21 @@ function ProductFactory($q, api) {
         });
     }
 
-    function addComponents(components) {
-        return function(product) {
-            product = $q.when(product);
-
-            _.each(components, function(list, key) {
-                _.each(list, function(value) {
-                    product = product
-                        .then(addComponent(key, value))
-                        .then(returnResponseObject);
-                });
-            });
-
-            return product;
-        };
+    function addPurchaseOption(product, offerWithMediaList) {
+        return api.request({
+                method: 'POST',
+                url: url('/v1/admin/products/' + product.id + '/offer'),
+                data: offerWithMediaList
+            })
+            .then(returnResponseObject);
     }
 
-    function addComponent(key, data) {
-        return function(product) {
-            return api.request({
-                    method: 'POST',
-                    url: url('/v1/admin/products/' + product.id + '/' + key),
-                    data: data
-                });
-        };
+    function removePurchaseOption(product, optionId) {
+        return api.request({
+                method: 'DELETE',
+                url: url('/v1/admin/products/' + product.id + '/offer/' + optionId)
+            })
+            .then(returnResponseObject);
     }
 
     // private
@@ -221,6 +220,74 @@ function ProductFactory($q, api) {
         function withNoId(item) {
             return !item.id;
         }
+    }
+
+    function addComponents(components) {
+        return function(product) {
+            product = $q.when(product);
+
+            _.each(components, function(list, key) {
+                _.each(list, function(value) {
+                    product = product
+                        .then(addComponent(key, value))
+                        .then(returnResponseObject);
+                });
+            });
+
+            return product;
+        };
+    }
+
+    function addComponent(key, data) {
+        return function(product) {
+            return api.request({
+                    method: 'POST',
+                    url: url('/v1/admin/products/' + product.id + '/' + key),
+                    data: data
+                });
+        };
+    }
+
+    function updateGenres(genres) {
+        return function(data) {
+            var product = $q.when(data);
+
+            if (_.isEmpty(genres)) {
+                return product;
+            }
+
+            return product
+                .then(addComponent('genre', genres))
+                .then(setGenres);
+
+            function setGenres() {
+                data.genres = genres;
+                return data;
+            }
+        };
+    }
+
+    function saveOffers(product) {
+        return _.map(product.offers, function(item) {
+            var offer = item.offer;
+            var exists = offer.isDirty;
+            var promise;
+
+            if (exists && !offer.isDirty()) {
+                promise = $q.when(offer);
+            } else if (!exists) {
+                delete offer.id;
+                promise = Offer.save(offer).then(returnResponseObject);
+            }
+
+            // TODO: undefined promise on save
+            return promise.then(addMediaList);
+
+            function addMediaList(offer) {
+                offer.mediaList = item.mediaList;
+                return offer;
+            }
+        });
     }
 }
 

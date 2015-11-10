@@ -13,7 +13,7 @@
       <a ng-click="vm.setItem($index, $event)">{{ $index + 1 }}</a>
     </li>
 
-    <li ng-hide="vm.$active < 0 || vm.$collapsed" class="pull-right">
+    <li ng-hide="vm.$collapsed || !model[options.key].length" class="pull-right">
       <a class="txt-color-red" ng-click="vm.removeActive()" tooltip="Delete">
         <i class="fa fa-fw fa-times"></i>
       </a>
@@ -32,7 +32,7 @@
       ng-init="::fields = vm.copyFields(to.fields)"
       ng-show="vm.$active === $index"
     >
-      <formly-form model="::item" form="::form" fields="::fields">
+      <formly-form model="item" form="::form" fields="::fields">
       </formly-form>
     </div>
 

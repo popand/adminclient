@@ -30,8 +30,13 @@
         formlyConfigProvider.setType({
             name: 'select2',
             extends: 'select',
+            defaultOptions: {
+                ngModelElAttrs: {
+                    'smart-select2-setter': 'to.select = setter'
+                }
+            },
             template: [
-              '<select data-smart-select2 multiple style="width:100%" ng-model="model[options.key]">',
+              '<select data-smart-select2 style="width:100%" ng-model="model[options.key]">',
               '</select>'
             ].join(' ')
         });
