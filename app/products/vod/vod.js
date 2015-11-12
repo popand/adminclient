@@ -28,6 +28,6 @@ function VodCtrl($state, Product) {
     }
 
     function edit(product) {
-        $state.go('app.products.details', {id: product.id});
+        $state.go('app.products.details', {id: product.productId});
     }
 }

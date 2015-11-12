@@ -19,7 +19,7 @@
       </a>
     </li>
 
-    <li ng-hide="vm.$collapsed">
+    <li ng-hide="vm.$collapsed && to.label">
       <a ng-click="vm.addNew()" tooltip="Add new">
         <i class="fa fa-fw" ng-class="vm.$processing? 'fa-spinner fa-spin' : 'fa-plus txt-color-blue'"></i>
       </a>

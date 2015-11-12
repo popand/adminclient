@@ -15,7 +15,10 @@ function ProductFactory($q, api, Offer) {
     Product.find = find;
     Product.save = save;
     Product.remove = remove;
-    Product.removePurchaseOption = removePurchaseOption;
+    Product.purchaseOption = {
+        add: addPurchaseOption,
+        remove: removePurchaseOption
+    };
 
     return Product;
 
@@ -92,9 +95,6 @@ function ProductFactory($q, api, Offer) {
         var genres = _.remove(product.genres);
 
         // Save all modified offers, later add them to the product.
-        var offers = saveOffers(product);
-        delete product.offers;
-
         if (product.id) {
             product = update(product);
         } else {
@@ -104,40 +104,13 @@ function ProductFactory($q, api, Offer) {
         return product
             .then(returnResponseObject)
             .then(addComponents(components))
-            .then(updateGenres(genres))
-            .then(addPurchaseOptions);
-
-        function addPurchaseOptions(product) {
-            return $q.all(offers)
-                .then(function(offers) {
-                    return _.reduce(offers, function(promise, offer) {
-                        return promise.then(function(product) {
-                            // TODO: videos aren't saved by the server
-
-                            // var mediaList = [];
-                            // _.each(offer.mediaList, function(id) {
-                            //     var video = _.find(product.videos, {url: url});
-                            //     if (video) {
-                            //         mediaList.push(video);
-                            //     }
-                            // });
-
-                            offer.mediaList = [];
-                            return addPurchaseOption(product, offer);
-                        });
-                    }, $q.when(product))
-                    .then(function(product) {
-                        product.offers = offers;
-                        return product;
-                    });
-                });
-        }
+            .then(updateGenres(genres));
     }
 
     function update(product) {
         return api.request({
                 method: 'PUT',
-                url: url('/v1/admin/products/' + product.id),
+                url: url('/v1/admin/products/' + product.productId),
                 data: product
             });
     }
@@ -153,7 +126,7 @@ function ProductFactory($q, api, Offer) {
     function find(id) {
         return api.request({
                 method: 'GET',
-                url: url('/v1/products/' + id + '/productDetails'),
+                url: url('/v1/admin/products/' + id + '/fullProductDetails'),
             })
             .then(returnResponseObject);
     }
@@ -168,18 +141,23 @@ function ProductFactory($q, api, Offer) {
     function addPurchaseOption(product, offerWithMediaList) {
         return api.request({
                 method: 'POST',
-                url: url('/v1/admin/products/' + product.id + '/offer'),
+                url: url('/v1/admin/products/' + product.productId + '/offer'),
                 data: offerWithMediaList
             })
             .then(returnResponseObject);
     }
 
-    function removePurchaseOption(product, optionId) {
-        return api.request({
-                method: 'DELETE',
-                url: url('/v1/admin/products/' + product.id + '/offer/' + optionId)
-            })
-            .then(returnResponseObject);
+    function removePurchaseOption(product, option) {
+        if (!product.productId || !option.purchaseOptionId) {
+            return;
+        }
+
+        var config = {
+            method: 'DELETE',
+            url: url('/v1/admin/products/' + product.productId + '/offer/' + option.purchaseOptionId)
+        };
+
+        return api.request(config).then(returnResponseObject);
     }
 
     // private
@@ -211,15 +189,19 @@ function ProductFactory($q, api, Offer) {
             preview: 'previewList',
         };
 
+        var keys = {
+            image: 'imageId',
+            video: 'mediaId',
+            preview: 'mediaId',
+        };
+
         _.each(ret, function(value, key) {
-            ret[key] = _.remove(product[value], withNoId);
+            ret[key] = _.remove(product[value], function(item) {
+                return !item[keys[key]];
+            });
         });
 
         return ret;
-
-        function withNoId(item) {
-            return !item.id;
-        }
     }
 
     function addComponents(components) {
@@ -242,7 +224,7 @@ function ProductFactory($q, api, Offer) {
         return function(product) {
             return api.request({
                     method: 'POST',
-                    url: url('/v1/admin/products/' + product.id + '/' + key),
+                    url: url('/v1/admin/products/' + product.productId + '/' + key),
                     data: data
                 });
         };
@@ -265,29 +247,6 @@ function ProductFactory($q, api, Offer) {
                 return data;
             }
         };
-    }
-
-    function saveOffers(product) {
-        return _.map(product.offers, function(item) {
-            var offer = item.offer;
-            var exists = offer.isDirty;
-            var promise;
-
-            if (exists && !offer.isDirty()) {
-                promise = $q.when(offer);
-            } else if (!exists) {
-                delete offer.id;
-                promise = Offer.save(offer).then(returnResponseObject);
-            }
-
-            // TODO: undefined promise on save
-            return promise.then(addMediaList);
-
-            function addMediaList(offer) {
-                offer.mediaList = item.mediaList;
-                return offer;
-            }
-        });
     }
 }
 

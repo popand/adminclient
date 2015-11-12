@@ -22,6 +22,24 @@
           </div>
 
         </form>
+        <form class="" ng-submit="vm.offers.onSave()" name="vm.offers.form" novalidate>
+
+          <div jarvis-widget id="wid-id-product-form" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+            <header><h2>Offers</h2></header>
+            <div>
+              <div class="widget-body">
+
+                  <formly-form model="vm.offers.model" fields="::vm.offers.fields" form="vm.offers.form" options="::vm.offers.options">
+                  </formly-form>
+
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary submit-button">Save</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
       </article>
     </div>
   </section>

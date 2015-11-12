@@ -8,6 +8,8 @@
     ProductDetailsCtrl.$inject = [
         '$state',
         '$timeout',
+        '$log',
+        '$q',
         'customFormlyFields',
         'customFormlyValidators',
         'product',
@@ -19,8 +21,9 @@
         'Offer',
     ];
 
+    /* jshint maxparams: false */
     function ProductDetailsCtrl(
-        $state, $timeout,
+        $state, $timeout, $log, $q,
         fields, validators,
         product, Product,
         Genre, Image, Video, PurchaseOption,
@@ -34,29 +37,32 @@
             product[key] = JSON.parse(angular.lowercase(product[key]));
         });
 
-        product.offers = [];
+        var offers = [];
+        vm.offers = {
+            model: {
+                offers: offers
+            },
+            fields: getOffersFields(),
+            onSave: saveOffers
+        };
 
         _.each(product.purchaseOptionList, function(option, index) {
             var ret = {};
-            ret.mediaList = _.pluck(option.mediaList, 'componentId');
+            ret.mediaList = _.pluck(option.mediaList, 'mediaId');
 
             if (!option.offerId) {
-                console.log(option);
-                if (product.id && option.id) {
-                    Product.removePurchaseOption(product, option.id);
-                }
+                Product.purchaseOption.remove(product, option);
                 delete product.purchaseOptionList[index];
                 return;
             }
 
             Offer.find(option.offerId).then(function(offer) {
                 ret.offer = offer;
+                offers.push(ret);
             });
-
-            product.offers.push(ret);
         });
 
-        console.log(angular.toJson(product, true));
+        $log.debug(angular.toJson(product, true));
 
         vm.onSave = save;
         vm.onDelete = remove;
@@ -87,7 +93,7 @@
                 buttons: '[No][Delete]'
             }, function (pressed) {
                 if (pressed === "Delete") {
-                    Product.remove(vm.model.id).then(goBack);
+                    Product.remove(vm.model.productId).then(goBack);
                 }
             });
         }
@@ -100,10 +106,53 @@
             }
         }
 
+        function saveOffers() {
+            var product = vm.model;
+
+            _.map(offers, saveOffer);
+
+            function saveOffer(item) {
+                var offer = item.offer;
+                var exists = offer.isDirty;
+                var promise;
+
+                if (exists && !offer.isDirty()) {
+                    promise = $q.when(offer);
+                } else if (!exists) {
+                    delete offer.id;
+                    promise = Offer.save(offer);
+                }
+
+                // TODO: undefined promise on save
+                return promise.then(addOffer);
+
+                function addOffer(offer) {
+                    offer.mediaList = [];
+
+                    _.each(item.mediaList, function(video) {
+                        video = _.find(product.videos, {mediaId: video.mediaId});
+                        if (video) {
+                            offer.mediaList.push(video);
+                        } else {
+                            $log.warn('video not found', video, product.videos);
+                        }
+                    });
+
+                    offer = _.cloneDeep(offer);
+                    offer.offerId = offer.id;
+                    delete offer.id;
+
+                    $log.debug(angular.toJson(offer, true));
+
+                    Product.purchaseOption.add(product, offer);
+                }
+            }
+        }
+
         // Fields
         function getFields() {
             return [
-                text({key: 'id', required: false}),
+                text({key: 'productId', required: false}),
                 text({key: 'bindId', required: true}),
 
                 group([
@@ -211,7 +260,7 @@
 
                 // TODO: imageType must be unique
                 section('Images', 'imageList', [
-                    text({key: 'id'}),
+                    text({key: 'imageId'}),
                     text({
                         key: 'imageURL',
                         label: 'Image URL',
@@ -226,74 +275,85 @@
 
                 section('Previews', 'previewList', video()),
                 section('Videos', 'videos', video()),
-
-                section('Offers', 'offers', [
-                    {
-                        type: 'select2',
-                        key: 'mediaList',
-                        templateOptions: {
-                            required: true,
-                            label: 'Media List',
-                            options: product.videos,
-                            ngOptions: 'x.id for x in to.options track by x.id'
-                        },
-                        ngModelElAttrs: {
-                            'multiple': '',
-                        },
-                        controller: ['$scope', function($scope) {
-                            $scope.$watch(function() {
-                                return vm.model.videos;
-                            }, function(videos) {
-                                $scope.to.options = _.filter(videos, 'id');
-                            });
-                        }]
-                    },
-
-                    {
-                        type: 'select2',
-                        key: 'offer',
-                        templateOptions: {
-                            label: 'Offer',
-                            options: [],
-                            ngOptions: 'x as x.name for x in to.options track by x.id'
-                        },
-                        controller: ['$scope', function($scope) {
-                            var empty = { id: null, name: 'New' };
-
-                            Offer.list({pageSize: 100, pageNumber: -1, cache: true})
-                                .then(function(offers) {
-                                    $scope.to.options = [empty].concat(offers);
-
-                                    _.each(offers, function(offer) {
-                                        var original = angular.toJson(offer);
-
-                                        offer.isDirty = function() {
-                                            return original !== angular.toJson(this);
-                                        };
-                                    });
-
-                                    // Workaround for select2, to set currently selected item.
-                                    $timeout(function() {
-                                        $scope.to.select($scope.originalModel.offerId);
-                                    });
-                                });
-                        }]
-                    },
-
-                    { template: '<hr/>'},
-                    text({key: 'offer.id', label: 'Id'}),
-                    text({key: 'offer.tenantId', label: 'Tenant Id'}),
-                    text({key: 'offer.regex', label: 'Regular Expression'}),
-                    text({key: 'offer.offerType', label: 'Offer Type'}),
-                    text({key: 'offer.name', label: 'Name'}),
-                    text({key: 'offer.price', label: 'Price'}),
-                    group([
-                        fields.date('offer.startDateTimestampMillis', 'Start Date'),
-                        fields.date('offer.endDateTimestampMillis', 'End Date'),
-                    ]),
-                    text({key: 'offer.entitlementDurationMillis', label: 'Entitlement Duration'}),
-                ])
             ];
+        }
+
+        function getOffersFields() {
+            var offersFields = [
+                {
+                    type: 'select2',
+                    key: 'mediaList',
+                    templateOptions: {
+                        required: true,
+                        label: 'Media List',
+                        options: product.videos,
+                        ngOptions: 'x.mediaId for x in to.options track by x.mediaId'
+                    },
+                    ngModelElAttrs: {
+                        'multiple': '',
+                    },
+                    controller: ['$scope', function($scope) {
+                        $scope.$watch(function() {
+                            return vm.model.videos;
+                        }, function(videos) {
+                            $scope.to.options = _.filter(videos, 'mediaId');
+                        });
+                    }]
+                },
+
+                {
+                    type: 'select2',
+                    key: 'offer',
+                    templateOptions: {
+                        label: 'Offer',
+                        options: [],
+                        ngOptions: 'x as x.name for x in to.options track by x.id'
+                    },
+                    controller: ['$scope', function($scope) {
+                        var empty = { id: null, name: 'New' };
+
+                        Offer.list({pageSize: 100, pageNumber: -1, cache: true})
+                            .then(function(offers) {
+                                $scope.to.options = [empty].concat(offers);
+
+                                _.each(offers, function(offer) {
+                                    var original = angular.toJson(offer);
+
+                                    offer.isDirty = function() {
+                                        return original !== angular.toJson(this);
+                                    };
+                                });
+
+                                // Workaround for select2, to set currently selected item.
+                                $timeout(function() {
+                                    $scope.to.select($scope.originalModel.offerId);
+                                });
+                            });
+                    }]
+                },
+
+                { template: '<hr/>'},
+                text({key: 'offer.id', label: 'Id'}),
+                text({key: 'offer.tenantId', label: 'Tenant Id'}),
+                text({key: 'offer.regex', label: 'Regular Expression'}),
+                text({key: 'offer.offerType', label: 'Offer Type'}),
+                text({key: 'offer.name', label: 'Name'}),
+                text({key: 'offer.price', label: 'Price'}),
+                group([
+                    fields.date('offer.startDateTimestampMillis', 'Start Date'),
+                    fields.date('offer.endDateTimestampMillis', 'End Date'),
+                ]),
+                text({key: 'offer.entitlementDurationMillis', label: 'Entitlement Duration'}),
+            ];
+
+            return [{
+                key: 'offers',
+                type: 'listSection',
+                templateOptions: {
+                    label: '',
+                    fields: offersFields
+                }
+            }];
         }
 
         // Field helpers
@@ -372,7 +432,7 @@
         function video() {
             return [
                 group([ // should be read-only
-                    text({key: 'id'}),
+                    text({key: 'mediaId'}),
                     text({key: 'componentId'}),
                 ]),
                 text({
@@ -395,14 +455,6 @@
             args.placeholder = args.placeholder || args.label;
 
             return args;
-        }
-
-        function zipWith(key) {
-            return function(value) {
-                var ret = {};
-                ret[key] = value;
-                return ret;
-            };
         }
     }
 

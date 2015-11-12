@@ -55,7 +55,7 @@ function OfferFactory(api) {
         } else {
             r = request('POST', offer.name, offer);
         }
-        return r;
+        return r.then(returnResponseObject);
     }
 
     function find(id) {
