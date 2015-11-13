@@ -20,6 +20,46 @@ function ProductFactory($q, api, Offer) {
         remove: removePurchaseOption
     };
 
+
+    var productKeys = [
+        "bindId",
+        "studio",
+        "longDescription",
+        "country",
+        "directors",
+        "rating",
+        "subtitleList",
+        "shortTitle",
+        "title",
+        "blackoutWindowStart",
+        "blackoutWindowEnd",
+        "network",
+        "contentProvider",
+        "requiredAddonIds",
+        "genres",
+        "tags",
+        "releaseYear",
+        "productType",
+        "seoUrl",
+        "languages",
+        "requiredPackageId",
+        "ratingReason",
+        "writers",
+        "shortDescription",
+        "runningTime",
+        "producers",
+        "boxOfficeGross",
+        "actors",
+        "blackoutIndicator",
+        "criticId",
+        "comingSoon",
+        "closedCaption",
+        "averageUserRating",
+        "altCode",
+        "deliveryTypes",
+        "canWatchNow",
+    ];
+
     return Product;
 
     // public
@@ -88,15 +128,19 @@ function ProductFactory($q, api, Offer) {
     }
 
     function save(product) {
+        var productId = product.productId;
+
         product = _.cloneDeep(product);
         console.log(angular.toJson(product, true));
 
         var components = getAddedComponents(product);
         var genres = _.remove(product.genres);
 
+        product = _.pick(product, productKeys);
+
         // Save all modified offers, later add them to the product.
-        if (product.id) {
-            product = update(product);
+        if (productId) {
+            product = update(productId, product);
         } else {
             product = create(product);
         }
@@ -107,11 +151,10 @@ function ProductFactory($q, api, Offer) {
             .then(updateGenres(genres));
     }
 
-    function update(product) {
-        product = _.omit(product, ['id', 'createdDate', 'lastModifiedDate']);
+    function update(productId, product) {
         return api.request({
                 method: 'PUT',
-                url: url('/v1/admin/products/' + product.productId),
+                url: url('/v1/admin/products/' + productId),
                 data: product
             });
     }
