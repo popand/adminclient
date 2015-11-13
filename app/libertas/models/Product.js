@@ -108,6 +108,7 @@ function ProductFactory($q, api, Offer) {
     }
 
     function update(product) {
+        product = _.omit(product, ['id', 'createdDate', 'lastModifiedDate']);
         return api.request({
                 method: 'PUT',
                 url: url('/v1/admin/products/' + product.productId),

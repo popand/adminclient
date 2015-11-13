@@ -131,8 +131,15 @@
 
                     _.each(item.mediaList, function(video) {
                         video = _.find(product.videos, {mediaId: video.mediaId});
+
                         if (video) {
-                            offer.mediaList.push(video);
+                            offer.mediaList.push(_.pick(video, [
+                                "mediaId",
+                                "screenFormat",
+                                "aspectRatio",
+                                "mediaFormat",
+                                "targetDevice",
+                            ]));
                         } else {
                             $log.warn('video not found', video, product.videos);
                         }
@@ -141,6 +148,18 @@
                     offer = _.cloneDeep(offer);
                     offer.offerId = offer.id;
                     delete offer.id;
+
+                    offer = _.pick(offer, [
+                        "regex",
+                        "offerType",
+                        "price",
+                        "startDateTimestampMillis",
+                        "endDateTimestampMillis",
+                        "entitlementDurationMillis",
+                        "name",
+                        "mediaList",
+                        "offerId",
+                    ]);
 
                     $log.debug(angular.toJson(offer, true));
 
