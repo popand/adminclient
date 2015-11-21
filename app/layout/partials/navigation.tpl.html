@@ -42,45 +42,6 @@
                 <a data-ui-sref="app.genres"><i class="fa fa-lg fa-fw fa-table"></i> {{getWord('Genres')}}</a>
             </li>
 
-
-
-            <li data-menu-collapse>
-                <a  href="#" >
-                    <i class="fa fa-lg fa-fw fa-puzzle-piece"></i> <span class="menu-item-parent">{{getWord('App Views')}}</span></a>
-                <ul>
-                    <li data-ui-sref-active="active">
-                        <a data-ui-sref="app.appViews.projects"><i class="fa fa-file-text-o"></i> {{getWord('Projects')}}</a>
-                    </li>
-                    <li data-ui-sref-active="active">
-                        <a data-ui-sref="app.appViews.blogDemo"><i class="fa fa-paragraph"></i> {{getWord('Blog')}}</a>
-                    </li>
-                    <li data-ui-sref-active="active">
-                        <a data-ui-sref="app.appViews.galleryDemo"><i class="fa fa-picture-o"></i> {{getWord('Gallery')}}</a>
-                    </li>
-
-                    <li data-menu-collapse>
-                        <a href="#"><i class="fa fa-comments"></i> {{getWord('Forum Layout')}}</a>
-                        <ul>
-                            <li data-ui-sref-active="active">
-                                <a data-ui-sref="app.appViews.forumDemo"><i class="fa fa-picture-o"></i> {{getWord('General View')}}</a>
-                            </li>
-                            <li data-ui-sref-active="active">
-                                <a data-ui-sref="app.appViews.forumTopicDemo"><i class="fa fa-picture-o"></i> {{getWord('Topic View')}}</a>
-                            </li>
-                            <li data-ui-sref-active="active">
-                                <a data-ui-sref="app.appViews.forumPostDemo"><i class="fa fa-picture-o"></i> {{getWord('Post View')}}</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li data-ui-sref-active="active">
-                        <a data-ui-sref="app.appViews.profileDemo"><i class="fa fa-group"></i> {{getWord('Profile')}}</a>
-                    </li>
-                    <li data-ui-sref-active="active">
-                        <a data-ui-sref="app.appViews.timelineDemo"><i class="fa fa-clock-o"></i> {{getWord('Timeline')}}</a>
-                    </li>
-                </ul>
-            </li>
-
         <!-- NOTE: This allows you to pull menu items from server -->
         <!-- <ul data-smart-menu-items="/api/menu-items.json"></ul> -->
     </nav>
