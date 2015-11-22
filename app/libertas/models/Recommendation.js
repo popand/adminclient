@@ -9,7 +9,7 @@ RecommendationFactory.$inject = ['libertasApi'];
 
 function RecommendationFactory(api) {
     Recommendation.list = list;
-    Recommendation.find = find;
+    Recommendation.findForProductId = findForProductId;
     Recommendation.save = save;
     Recommendation.remove = remove;
 
@@ -18,15 +18,16 @@ function RecommendationFactory(api) {
 
     function Recommendation() {
         this.id = null;  // (string, optional),
-        this.deleteDate = null;  // (string, optional),
-        this.tenantId = null;  // (string, optional),
-        this.name = null;  // (string, optional)
+        this.tenantId = null; // (string, optional),
+        this.deleteDate = null; // (string, optional),
+        this.productId = null;  // (string, optional),
+        this.recommendationProductIds = [];  // (string, optional)
     }
 
     function list(params) {
         var config = {
             method: 'GET',
-            url: url('/v1/admin/recommendation/findAll'),
+            url: url('/recommendation/findAll'),
             params: params
         };
 
@@ -34,37 +35,74 @@ function RecommendationFactory(api) {
             .then(returnResponseObject);
     }
 
-    function save(recommendation) {
+    function save(obj) {
         var r;
-        if (recommendation.id) {
-            r = request('PUT', recommendation.id, {name: recommendation.name});
+        var productIds = obj.recommendationProductIds;
+
+        if (obj.id) {
+            // Update
+            r = api.request({
+                method: 'PUT',
+                url: url('/admin/recommendation/' + obj.id),
+                data: {
+                    recommendationList: productIds
+                }
+            });
         } else {
-            r = request('POST', recommendation.name);
+            // Create
+            r = api.request({
+                method: 'POST',
+                url: url('/admin/recommendation/product/' + obj.productId),
+                data: {
+                    recommendationProductList: {
+                        productIds: productIds
+                    }
+                }
+            });
         }
         return r;
     }
 
-    function find(id) {
-        return request('GET', id).then(returnResponseObject);
+    function findForProductId(productId) {
+        /*
+            TODO: requires pageNumber, but it doesn't look a paged content.
+            Response is:
+                response.data.responseObject.recommendation = {
+                    productId: string
+                    recommendationProductIds: []
+                }
+
+            It suggests that there is only one recommendation per product.
+        */
+        var request = api.request({
+            method: 'GET',
+            url: url('/recommendation/product/' + productId),
+            params: {
+                pageNumber: 0,
+                pageSize: 100
+            }
+        });
+
+        return request.then(function(response) {
+            console.log('findProduct', response);
+            return response.data.responseObject.recommendation;
+        });
     }
 
-    function remove(id) {
-        return request('DELETE', id);
+    function remove(productId) {
+        // TODO: doesn't sound right, it deletes all recommendations of a product?
+        return api.request({
+            method: 'DELETE',
+            url: url('/admin/recommendation/product/' + productId)
+        });
     }
 
     // private
 
     function url(path) {
-        return api.url('/recommendationservice' + path);
+        return api.url('/recommendationservice/v1' + path);
     }
 
-    function request(method, path, data) {
-        return api.request({
-            method: method,
-            url: url('/v1/admin/recommendation/' + path),
-            data: data
-        });
-    }
 
     function returnResponseObject(response) {
         return response.data.responseObject;

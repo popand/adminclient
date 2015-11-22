@@ -8,6 +8,7 @@ angular.module('libertas')
 ProductFactory.$inject = ['$q', 'libertasApi', 'Offer'];
 
 function ProductFactory($q, api, Offer) {
+    Product.url = url;
     Product.retrieveAll = retrieveAll;
     Product.retrieveByTags = retrieveAllByTags;
     Product.retrieveByIds = retrieveAllByIds;
@@ -116,15 +117,15 @@ function ProductFactory($q, api, Offer) {
 
 
     function retrieveAllByIds(params) {
-        return list(url('/v1/products/retrieveAllProductDetailsByIds'), params);
+        return list(url('/products/retrieveAllProductDetailsByIds'), params);
     }
 
     function retrieveAllByTags(params) {
-        return list(url('/v1/products/retrieveAllProductDetailsByTags'), params);
+        return list(url('/products/retrieveAllProductDetailsByTags'), params);
     }
 
     function retrieveAll(params) {
-        return list(url('/v1/products/retrieveAllProductDetail'), params);
+        return list(url('/products/retrieveAllProductDetail'), params);
     }
 
     function save(product) {
@@ -154,7 +155,7 @@ function ProductFactory($q, api, Offer) {
     function update(productId, product) {
         return api.request({
                 method: 'PUT',
-                url: url('/v1/admin/products/' + productId),
+                url: url('/admin/products/' + productId),
                 data: product
             });
     }
@@ -162,7 +163,7 @@ function ProductFactory($q, api, Offer) {
     function create(product) {
         return api.request({
                 method: 'POST',
-                url: url('/v1/admin/products'),
+                url: url('/admin/products'),
                 data: product
             });
     }
@@ -170,7 +171,7 @@ function ProductFactory($q, api, Offer) {
     function find(id) {
         return api.request({
                 method: 'GET',
-                url: url('/v1/admin/products/' + id + '/fullProductDetails'),
+                url: url('/admin/products/' + id + '/fullProductDetails'),
             })
             .then(returnResponseObject);
     }
@@ -178,14 +179,14 @@ function ProductFactory($q, api, Offer) {
     function remove(id) {
         return api.request({
             method: 'DELETE',
-            url: url('/v1/admin/products/' + id),
+            url: url('/admin/products/' + id),
         });
     }
 
     function addPurchaseOption(product, offerWithMediaList) {
         return api.request({
                 method: 'POST',
-                url: url('/v1/admin/products/' + product.productId + '/offer'),
+                url: url('/admin/products/' + product.productId + '/offer'),
                 data: offerWithMediaList
             })
             .then(returnResponseObject);
@@ -198,7 +199,7 @@ function ProductFactory($q, api, Offer) {
 
         var config = {
             method: 'DELETE',
-            url: url('/v1/admin/products/' + product.productId + '/offer/' + option.purchaseOptionId)
+            url: url('/admin/products/' + product.productId + '/offer/' + option.purchaseOptionId)
         };
 
         return api.request(config).then(returnResponseObject);
@@ -206,19 +207,31 @@ function ProductFactory($q, api, Offer) {
 
     // private
 
-    function list(url, params) {
+    function list(url, args) {
+        var all = args.pageNumber < 0;
+
+        var params = _.cloneDeep(args);
+        delete params.cache;
+
+        if (all) {
+            params.pageNumber = 0;
+        }
+
+
         var config = {
             method: 'GET',
             url: url,
-            params: params
+            params: params,
+            cache: args.cache
         };
 
-        return api.request(config)
-            .then(returnResponseObject);
+        var r = api.request(config);
+
+        return all? api.all(r) : r.then(returnResponseObject);
     }
 
     function url(path) {
-        return api.url('/productservice' + path);
+        return api.url('/productservice/v1' + path);
     }
 
     function returnResponseObject(response) {
@@ -268,7 +281,7 @@ function ProductFactory($q, api, Offer) {
         return function(product) {
             return api.request({
                     method: 'POST',
-                    url: url('/v1/admin/products/' + product.productId + '/' + key),
+                    url: url('/admin/products/' + product.productId + '/' + key),
                     data: data
                 });
         };

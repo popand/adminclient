@@ -37,7 +37,8 @@ angular.module('app', [
     'app.promotions',
     'app.offers',
     'app.entitlements',
-    'app.genres'
+    'app.genres',
+    'app.recommendations'
 ])
 .config(function ($provide, $httpProvider) {
 

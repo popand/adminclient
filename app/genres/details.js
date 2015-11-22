@@ -13,7 +13,6 @@
     function GenreDetailsCtrl(Genre, genre, fields) {
         var vm = this;
 
-        genre.date = '123';
         vm.model = genre;
         vm.onSave = submit;
         vm.onDelete = remove;
