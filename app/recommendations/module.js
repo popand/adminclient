@@ -2,6 +2,7 @@
 
 angular.module('app.recommendations', [
     'ui.router',
+    'ui.select',
     'libertas'
 ]);
 

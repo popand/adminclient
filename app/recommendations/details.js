@@ -5,12 +5,14 @@
         .controller('RecommendationDetailsCtrl', RecommendationDetailsCtrl);
 
     RecommendationDetailsCtrl.$inject = [
+        '$q',
+        'Product',
         'Recommendation',
         'model',
         'customFormlyFields'
     ];
 
-    function RecommendationDetailsCtrl(Recommendation, model, fields) {
+    function RecommendationDetailsCtrl($q, Product, Recommendation, model, fields) {
         var vm = this;
 
         vm.model = model;
@@ -19,16 +21,9 @@
 
         vm.fields = [
             text('id'),
-            text('productId', true),
+            select('productId', null, 'Search product ...', false),
             fields.tenantId,
-            {
-                type: 'list',
-                key: 'recommendationProductIds',
-                templateOptions: {
-                    required: true,
-                    label: 'Recommendations'
-                }
-            },
+            select('recommendationProductIds', 'Recommendations', 'Select products ...', true)
         ];
 
         function submit() {
@@ -37,16 +32,6 @@
 
         function remove() {
             return Recommendation.remove(vm.model.productId);
-        }
-
-        function getFields() {
-            return [
-                fields.group([
-                    text('id'),
-                    fields.tenantId,
-                ]),
-                'recommendationProductIds',
-            ];
         }
 
         function text(key, required) {
@@ -59,6 +44,89 @@
                     placeholder: _.startCase(key)
                 }
             };
+        }
+
+        function select(key, label, placeholder, multiple) {
+            var options = vm.model[key];
+            if (!_.isArray(options)) {
+                options = [options];
+            }
+
+            return {
+                key: key,
+                type: 'ui-select',
+                ngModelElAttrs: multiple? {'multiple': ''} : {},
+                templateOptions: {
+                    required: true,
+                    options: _.map(options, asProductObject),
+                    label: label || fields.labelFromKey(key),
+                    placeholder: placeholder,
+                    optionsAttr: 'bs-options',
+                    ngOptions: 'option.productId as option in to.options',
+                    selectTemplate: productSelectTemplate,
+                    choiceTemplate: productChoiceTemplate,
+                    refresh: getProductOptions,
+                    refreshDelay: 250
+                }
+            };
+        }
+
+        function getProductOptions(search, field) {
+            var promise;
+
+            if (!search) {
+                promise = $q.when([]);
+
+            } else {
+                var params = {
+                    tags: [search],
+                    pageSize: 100,
+                    pageNumber: -1,
+                    cache: true
+                };
+
+                promise = Product.retrieveByTags(params);
+            }
+
+            return promise.then(function(content) {
+                var value = field.value();
+                var skip = _.invert(_.isArray(value)? value : [value]);
+
+                field.templateOptions.options = _.filter(content, dups);
+
+                function dups(x) {
+                    return !skip[x.productId];
+                }
+            });
+        }
+
+        var templates = _.mapValues({
+            inline: '${text} <small class="text-muted">${help}</small>',
+            twoline: '<div>${text}</div><small class="text-muted">${help}</small>'
+        }, _.template);
+
+        function productChoiceTemplate(product, search) {
+            return templates.twoline({
+                text: product.title || product.shortTitle || '[No title]',
+                help: product.productId
+            });
+        }
+
+        function productSelectTemplate(product, item) {
+            var value = item || product;
+
+            if (!value) {
+                return '';
+            }
+
+            var help = item? '' : (value.title || value.shortTitle);
+            var text = value.productId;
+
+            return help? templates.inline({text: text, help: help}) : text;
+        }
+
+        function asProductObject(productId) {
+            return {productId: productId};
         }
     }
 }());

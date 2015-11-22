@@ -33,3 +33,8 @@ table.dataTable thead>tr>th {
     line-height: 1.62;
     font-size: 13px;
 }
+
+
+.formly .select2-results .select2-highlighted:hover {
+    color: black;
+}

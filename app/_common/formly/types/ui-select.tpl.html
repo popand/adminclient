@@ -1,0 +1,9 @@
+<ui-select data-ng-model="model[options.key]" data-required="{{::to.required}}" data-disabled="{{to.disabled}}" style="width:100%" theme="select2">
+  <ui-select-match placeholder="{{::to.placeholder}}">
+    <span ng-bind-html="to.selectTemplate($select.selected, $item)"></span>
+  </ui-select-match>
+
+  <ui-select-choices data-repeat="{{::to.ngOptions}}" data-refresh="to.refresh($select.search, options)" data-refresh-delay="{{::to.refreshDelay}}">
+    <div ng-bind-html="::to.choiceTemplate(option, $select.search)"></div>
+  </ui-select-choices>
+</ui-select>

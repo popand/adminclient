@@ -15,6 +15,7 @@
     "angular-local-storage",
     "angular-formly",
     "angular-formly-templates-bootstrap",
+    "ui-select",
     "restangular",
     "fastclick",
     "moment",
@@ -59,6 +60,7 @@
     "jquery-color": "plugin/jquery-color/jquery.color.js",
 
     "select2": "plugin/select2/select2.3.5.1.min.js",
+    "ui-select": "plugin/ui-select/dist/select.min.js",
 
     "summernote": "plugin/summernote/dist/summernote.min.js",
 
