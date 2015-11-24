@@ -25,6 +25,6 @@ function GenresCtrl($state, Genre) {
     }
 
     function edit(genre) {
-        $state.go('app.genres.details', {id: genre.id});
+        $state.go('app.genres.details', {id: genre.genreId});
     }
 }
