@@ -37,27 +37,21 @@ function RecommendationFactory(api) {
 
     function save(obj) {
         var r;
-        var productIds = obj.recommendationProductIds;
+        var data = obj.recommendationProductIds;
 
         if (obj.id) {
             // Update
             r = api.request({
                 method: 'PUT',
-                url: url('/admin/recommendation/' + obj.id),
-                data: {
-                    recommendationList: productIds
-                }
+                url: url('/admin/recommendation/' + obj.productId),
+                data: data
             });
         } else {
             // Create
             r = api.request({
                 method: 'POST',
                 url: url('/admin/recommendation/product/' + obj.productId),
-                data: {
-                    recommendationProductList: {
-                        productIds: productIds
-                    }
-                }
+                data: data
             });
         }
         return r;
