@@ -1,6 +1,18 @@
 (function() {
     'use strict';
 
+    function readonlyField(key, label, placeholder) {
+        return {
+            key: key,
+            type: 'input',
+            templateOptions: {
+                disabled: true,
+                required: false,
+                label: label || _.startCase(key)
+            }
+        };
+    }
+
     var fields = {
         name: {
             key: "name",
@@ -11,14 +23,10 @@
                 placeholder: "Name"
             }
         },
-        tenantId: {
-            key: "tenantId",
-            type: "input",
-            templateOptions: {
-                label: "Tenant Id",
-                placeholder: "Tenant Id"
-            }
-        },
+
+        id: readonlyField('id'),
+        tenantId: readonlyField('tenantId'),
+        readonly: readonlyField,
 
         tags: function(model, key) {
             key = key || 'tags';

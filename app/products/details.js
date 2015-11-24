@@ -171,7 +171,7 @@
         // Fields
         function getFields() {
             return [
-                text({key: 'productId', required: false}),
+                fields.readonly('productId'),
                 text({key: 'bindId', required: true}),
 
                 group([
@@ -279,7 +279,7 @@
 
                 // TODO: imageType must be unique
                 section('Images', 'imageList', [
-                    text({key: 'imageId'}),
+                    fields.readonly('imageId'),
                     text({
                         key: 'imageURL',
                         label: 'Image URL',
@@ -352,7 +352,7 @@
                 },
 
                 { template: '<hr/>'},
-                text({key: 'offer.id', label: 'Id'}),
+                fields.readonly('offer.id', 'Id'),
                 text({key: 'offer.tenantId', label: 'Tenant Id'}),
                 text({key: 'offer.regex', label: 'Regular Expression'}),
                 text({key: 'offer.offerType', label: 'Offer Type'}),
@@ -451,8 +451,8 @@
         function video() {
             return [
                 group([ // should be read-only
-                    text({key: 'mediaId'}),
-                    text({key: 'componentId'}),
+                    fields.readonly('mediaId'),
+                    fields.readonly('componentId'),
                 ]),
                 text({
                     key: 'url',

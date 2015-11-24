@@ -20,10 +20,9 @@
         vm.onDelete = remove;
 
         vm.fields = [
-            text('id'),
-            select('productId', null, 'Search product ...', false),
             fields.tenantId,
-            select('recommendationProductIds', 'Recommendations', 'Select products ...', true)
+            model.productId? fields.readonly('productId') : select('productId'),
+            select('recommendationProductIds', 'Recommendations', 'Search products', true)
         ];
 
         function submit() {
